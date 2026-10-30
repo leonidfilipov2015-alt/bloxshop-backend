@@ -163,10 +163,9 @@ def edit_product(product_id):
 
     return jsonify({"success": True})
 
+ init_db()
 
-if __name__ == "__main__":
-    init_db()
-
+ if __name__ == "__main__":
     if not BOT_TOKEN:
         raise RuntimeError("Не найден BOT_TOKEN!")
 
