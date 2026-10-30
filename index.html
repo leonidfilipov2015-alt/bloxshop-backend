@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blox Shop</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #101525;
+    color: white;
+}
+
+header {
+    text-align: center;
+    padding: 25px 15px;
+    background: #192541;
+}
+
+header h1 {
+    color: #65aaff;
+    font-size: 32px;
+}
+
+header p {
+    color: #c3cce0;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    flex-wrap: wrap;
+}
+
+nav button {
+    background: #263d68;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+nav button.active {
+    background: #2878ed;
+}
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    max-width: 900px;
+    margin: auto;
+}
+
+.product {
+    background: #1b2740;
+    border-radius: 15px;
+    padding: 18px;
+    text-align: center;
+}
+
+.product .emoji {
+    font-size: 45px;
+}
+
+.product h3 {
+    margin: 10px 0;
+}
+
+.price {
+    color: #62a8ff;
+    font-weight: bold;
+}
+
+.buy {
+    background: #2878ed;
+    color: white;
+    border: none;
+    padding: 11px;
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.buy:hover {
+    background: #145bc0;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #aab5ca;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🛒 BLOX SHOP</h1>
+    <p>Магазин Blox Fruits и Steal a Brainrot</p>
+</header>
+
+<nav>
+    <button class="active" onclick="showProducts('blox', this)">
+        🍎 Blox Fruits
+    </button>
+
+    <button onclick="showProducts('brainrot', this)">
+        🧠 Brainrot
+    </button>
+</nav>
+
+<div class="products" id="products"></div>
+
+<footer>
+    <p>🔥 Blox Shop</p>
+    <p>Покупка через продавца</p>
+    <p>Продавец: @Legendjhnb</p>
+</footer>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+const API_URL = "http://127.0.0.1:5000";
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+const API_URL = "http://127.0.0.1:5000";
+const products = {
+    blox: [
+        {name: "Лайтинг", price: "25 Robux", emoji: "⚡"},
+        {name: "Шадоу", price: "10 Robux", emoji: "🌑"},
+        {name: "Мамонт", price: "15 Robux", emoji: "🐘"},
+        {name: "Портал", price: "15 Robux", emoji: "🌀"},
+        {name: "Тесто", price: "Уточнить", emoji: "🍩"},
+        {name: "Газ", price: "Уточнить", emoji: "☁️"}
+    ],
+
+    brainrot: [
+        {name: "Брейнрот 1", price: "Уточнить", emoji: "🧠"},
+        {name: "Брейнрот 2", price: "Уточнить", emoji: "🐸"},
+        {name: "Брейнрот 3", price: "Уточнить", emoji: "🦈"}
+    ]
+};
+
+function showProducts(category, button) {
+    const container = document.getElementById("products");
+
+    container.innerHTML = "";
+
+    document.querySelectorAll("nav button").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    products[category].forEach(product => {
+        container.innerHTML += `
+            <div class="product">
+                <div class="emoji">${product.emoji}</div>
+                <h3>${product.name}</h3>
+                <div class="price">${product.price}</div>
+                <button class="buy"
+                    onclick="buyProduct('${product.name}')">
+                    💬 Купить
+                </button>
+            </div>
+        `;
+    });
+}
+
+function buyProduct(name) {
+    const productsIds = {
+        "Лайтинг": "lighting",
+        "Шадоу": "shadow",
+        "Мамонт": "mammoth",
+        "Портал": "portal",
+        "Тесто": "dough",
+        "Газ": "gas",
+        "Брейнрот 1": "brainrot1",
+        "Брейнрот 2": "brainrot2",
+        "Брейнрот 3": "brainrot3"
+    };
+
+    const productId = productsIds[name];
+
+    window.open(
+        "https://t.me/BloxShopLegend_bot?start=buy_" + productId,
+        "_blank"
+    );
+}
+showProducts("blox", document.querySelector("nav button"));
+</script>
+
+</body>
+</html>
