@@ -269,8 +269,14 @@ def add_product():
             "error": "Укажи название и цену"
         }), 400
 
-    db = connect_db()
 
+if category not in ("blox", "brainrot"):
+    return jsonify({
+        "success": False,
+        "error": "Неверная категория"
+    }), 400
+
+db = connect_db()
     try:
         cursor = db.execute("""
             INSERT INTO products
