@@ -9,7 +9,6 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-* { box-sizing: border-box; }<style>
 * {
     box-sizing: border-box;
 }
@@ -281,6 +280,13 @@ footer {
         placeholder="🔎 Найти товар..."
         oninput="showProducts(currentCategory)"
     >
+
+    <button
+        onclick="clearSearch()"
+        style="width:100%; margin-top:8px; padding:10px;
+        background:#292344; border-radius:10px;">
+        ❌ Очистить поиск
+    </button>
 </div>
 
 <div class="products" id="products">
@@ -398,11 +404,12 @@ const filtered = allProducts.filter(product =>
     product.name.toLowerCase().includes(searchText)
 );
 
-    if (filtered.length === 0) {
-        container.innerHTML =
-            '<div class="status">📦 В этой категории пока нет товаров.</div>';
-        return;
-    }
+   if (filtered.length === 0) {
+    container.innerHTML = searchText
+        ? '<div class="status">🔎 Товар не найден. Попробуй другое название!</div>'
+        : '<div class="status">📦 В этой категории пока нет товаров.</div>';
+    return;
+}
 
     filtered.forEach(product => {
         const card = document.createElement("div");
@@ -634,6 +641,10 @@ async function deleteProduct(product) {
 }
 
 loadProducts();
+function clearSearch() {
+    document.getElementById("searchInput").value = "";
+    showProducts(currentCategory);
+}
 </script>
 
 </body>
