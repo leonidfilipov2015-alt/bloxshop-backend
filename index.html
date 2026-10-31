@@ -2,211 +2,601 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10101c">
 <title>Blox Shop</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+* { box-sizing: border-box; }<style>
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
+    padding: 16px;
+    background:
+        radial-gradient(ellipse at top, #29205a 0%, transparent 50%),
+        #090912;
+    color: white;
     font-family: Arial, sans-serif;
-    background: #101525;
-    color: white;
 }
 
-header {
+.header {
     text-align: center;
-    padding: 25px 15px;
-    background: #192541;
+    padding: 28px 15px;
+    background: linear-gradient(135deg, #713cff, #24104d, #11152e);
+    border: 1px solid #7955ff;
+    border-radius: 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 35px #713cff35;
 }
 
-header h1 {
-    color: #65aaff;
+.header h1 {
+    margin: 5px;
     font-size: 32px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px #b89aff;
 }
 
-header p {
-    color: #c3cce0;
+.header p {
+    color: #ded5ff;
 }
 
-nav {
+.tabs {
     display: flex;
-    justify-content: center;
     gap: 10px;
-    padding: 15px;
-    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
-nav button {
-    background: #263d68;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 12px 20px;
+button {
     cursor: pointer;
+    border: none;
+    color: white;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
-nav button.active {
-    background: #2878ed;
+button:active {
+    transform: scale(0.96);
+}
+
+.tab {
+    flex: 1;
+    padding: 15px 5px;
+    background: #1c1b30;
+    border: 1px solid #393454;
+    border-radius: 13px;
+}
+
+.tab.active {
+    background: linear-gradient(135deg, #8955ff, #5425cf);
+    border-color: #a78aff;
+    box-shadow: 0 0 18px #713cff55;
 }
 
 .products {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-    gap: 15px;
-    padding: 15px;
-    max-width: 900px;
-    margin: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
 }
 
 .product {
-    background: #1b2740;
-    border-radius: 15px;
-    padding: 18px;
+    background: linear-gradient(160deg, #25243d, #151522);
+    border: 1px solid #40375f;
+    border-radius: 19px;
+    padding: 12px 10px;
     text-align: center;
+    min-width: 0;
+    box-shadow: 0 5px 20px #0005;
+    transition: 0.2s;
 }
 
-.product .emoji {
-    font-size: 45px;
+.product:active {
+    transform: scale(0.98);
+}
+
+.emoji {
+    font-size: 52px;
+    margin: 12px;
+    filter: drop-shadow(0 0 10px #8955ff);
+}
+
+.product-image {
+    width: 100%;
+    height: 155px;
+    object-fit: contain;
+    border-radius: 13px;
+    margin: 4px 0 10px;
+    background: #11111e;
 }
 
 .product h3 {
-    margin: 10px 0;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+    min-height: 36px;
 }
 
 .price {
-    color: #62a8ff;
+    color: #c3a4ff;
+    font-size: 16px;
     font-weight: bold;
+    margin: 13px 0;
+    text-shadow: 0 0 10px #8955ff55;
 }
 
-.buy {
-    background: #2878ed;
-    color: white;
-    border: none;
-    padding: 11px;
+.buy, .admin-button {
     width: 100%;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 10px;
+    padding: 13px 8px;
+    background: linear-gradient(135deg, #914fff, #5425d5);
+    border: 1px solid #a17aff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px #713cff40;
 }
 
-.buy:hover {
-    background: #145bc0;
+.buy:active, .admin-button:active {
+    background: #5425d5;
+}
+
+.status {
+    text-align: center;
+    color: #aaa;
+    padding: 30px 10px;
+    grid-column: 1 / -1;
+}
+
+.admin {
+    margin-top: 26px;
+    padding: 17px;
+    background: linear-gradient(145deg, #24213d, #151522);
+    border: 1px solid #8955ff;
+    border-radius: 19px;
+    box-shadow: 0 0 25px #713cff25;
+}
+
+.admin h2 {
+    text-align: center;
+    color: #c9adff;
+}
+
+.admin input, .admin select {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin: 11px 0;
+    border-radius: 11px;
+    border: 1px solid #494064;
+    background: #11111e;
+    color: white;
+    outline: none;
+}
+
+.admin input:focus, .admin select:focus {
+    border-color: #8955ff;
+    box-shadow: 0 0 10px #713cff44;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-actions button {
+    flex: 1;
+}
+
+.secondary {
+    background: #45455c !important;
+}
+
+.edit, .delete {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 9px;
+}
+
+.edit {
+    background: #4545a0;
+}
+
+.delete {
+    background: #a83248;
+}
+
+.hidden {
+    display: none !important;
 }
 
 footer {
     text-align: center;
-    padding: 25px;
-    color: #aab5ca;
+    color: #777;
+    margin-top: 30px;
+    padding: 15px;
+    font-size: 12px;
+}
+
+@media (max-width: 350px) {
+    .products {
+        gap: 8px;
+    }
+
+    .product {
+        padding: 9px 6px;
+    }
+
+    .product-image {
+        height: 120px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-    <h1>🛒 BLOX SHOP</h1>
+<div class="header">
+    <h1>🔥 BLOX SHOP</h1>
     <p>Магазин Blox Fruits и Steal a Brainrot</p>
-</header>
+    <p>🛒 Лучшие товары по хорошим ценам!</p>
+</div>
 
-<nav>
-    <button class="active" onclick="showProducts('blox', this)">
-        🍎 Blox Fruits
-    </button>
+<div class="tabs">
+    <button class="tab active" id="bloxTab"
+        onclick="showProducts('blox')">🍎 Blox Fruits</button>
 
-    <button onclick="showProducts('brainrot', this)">
-        🧠 Brainrot
-    </button>
-</nav>
+    <button class="tab" id="brainrotTab"
+        onclick="showProducts('brainrot')">🧠 Brainrot</button>
+</div>
 
-<div class="products" id="products"></div>
+<div class="products" id="products">
+    <div class="status">⏳ Загружаем товары...</div>
+</div>
 
-<footer>
-    <p>🔥 Blox Shop</p>
-    <p>Покупка через продавца</p>
-    <p>Продавец: @Legendjhnb</p>
-</footer>
+<div class="admin hidden" id="adminPanel">
+    <h2>⚙️ Панель администратора</h2>
+    <p style="text-align:center;color:#aaa">
+        Управление товарами магазина
+    </p>
+
+    <input id="productName" placeholder="Название товара">
+    <input id="productPrice" placeholder="Цена товара">
+    <input id="productEmoji" placeholder="Эмодзи, например 🍎">
+    <input id="productImageFileId" placeholder="Telegram file_id фотографии (необязательно)">
+
+    <select id="productCategory">
+        <option value="blox">Blox Fruits</option>
+        <option value="brainrot">Steal a Brainrot</option>
+    </select>
+
+    <div class="admin-actions">
+        <button class="admin-button" id="saveButton"
+            onclick="saveProduct()">➕ Добавить товар</button>
+
+        <button class="admin-button secondary hidden"
+            id="cancelButton" onclick="cancelEdit()">Отмена</button>
+    </div>
+
+    <p id="adminMessage" style="text-align:center;color:#aaa"></p>
+</div>
+
+<footer>Blox Shop 2.0 © 2026</footer>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+const tg = window.Telegram?.WebApp;
 
-const API_URL = "http://127.0.0.1:5000";
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor("#10101c");
+    tg.setBackgroundColor("#10101c");
+}
 
-const API_URL = "http://127.0.0.1:5000";
-const products = {
-    blox: [
-        {name: "Лайтинг", price: "25 Robux", emoji: "⚡"},
-        {name: "Шадоу", price: "10 Robux", emoji: "🌑"},
-        {name: "Мамонт", price: "15 Robux", emoji: "🐘"},
-        {name: "Портал", price: "15 Robux", emoji: "🌀"},
-        {name: "Тесто", price: "Уточнить", emoji: "🍩"},
-        {name: "Газ", price: "Уточнить", emoji: "☁️"}
-    ],
+const API_URL = "https://bloxshop-backend.onrender.com";
+const ADMIN_ID = 7580041056;
 
-    brainrot: [
-        {name: "Брейнрот 1", price: "Уточнить", emoji: "🧠"},
-        {name: "Брейнрот 2", price: "Уточнить", emoji: "🐸"},
-        {name: "Брейнрот 3", price: "Уточнить", emoji: "🦈"}
-    ]
-};
+let allProducts = [];
+let currentCategory = "blox";
+let editingProductId = null;
 
-function showProducts(category, button) {
+const isAdmin =
+    Number(tg?.initDataUnsafe?.user?.id) === ADMIN_ID;
+
+if (isAdmin) {
+    document.getElementById("adminPanel")
+        .classList.remove("hidden");
+}
+
+function authHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "X-Telegram-Init-Data": tg?.initData || ""
+    };
+}
+
+// Загрузка товаров
+async function loadProducts() {
     const container = document.getElementById("products");
+    container.innerHTML =
+        '<div class="status">⏳ Загружаем товары...</div>';
 
+    try {
+        const response = await fetch(API_URL + "/api/products");
+
+        if (!response.ok) {
+            throw new Error("Ошибка сервера: " + response.status);
+        }
+
+        const data = await response.json();
+
+        allProducts = Array.isArray(data)
+            ? data
+            : (data.products || []);
+
+        showProducts(currentCategory);
+
+    } catch (error) {
+        console.error(error);
+        container.innerHTML =
+            '<div class="status">❌ Ошибка загрузки товаров.<br><br>' +
+            '<button class="buy" onclick="loadProducts()">🔄 Повторить</button></div>';
+    }
+}
+
+// Отображение товаров
+function showProducts(category) {
+    currentCategory = category;
+
+    document.getElementById("bloxTab")
+        .classList.toggle("active", category === "blox");
+
+    document.getElementById("brainrotTab")
+        .classList.toggle("active", category === "brainrot");
+
+    const container = document.getElementById("products");
     container.innerHTML = "";
 
-    document.querySelectorAll("nav button").forEach(btn => {
-        btn.classList.remove("active");
-    });
+    const filtered = allProducts.filter(
+        product => product.category === category
+    );
 
-    button.classList.add("active");
+    if (filtered.length === 0) {
+        container.innerHTML =
+            '<div class="status">📦 В этой категории пока нет товаров.</div>';
+        return;
+    }
 
-    products[category].forEach(product => {
-        container.innerHTML += `
-            <div class="product">
-                <div class="emoji">${product.emoji}</div>
-                <h3>${product.name}</h3>
-                <div class="price">${product.price}</div>
-                <button class="buy"
-                    onclick="buyProduct('${product.name}')">
-                    💬 Купить
-                </button>
-            </div>
-        `;
+    filtered.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product";
+
+        let visual;
+
+        if (product.image_url) {
+            visual = document.createElement("img");
+            visual.className = "product-image";
+            visual.src = product.image_url;
+            visual.alt = product.name || "Фото товара";
+            visual.loading = "lazy";
+            visual.onerror = () => {
+                visual.remove();
+                const fallback = document.createElement("div");
+                fallback.className = "emoji";
+                fallback.textContent = product.emoji || "🎁";
+                card.insertBefore(fallback, name);
+            };
+        } else {
+            visual = document.createElement("div");
+            visual.className = "emoji";
+            visual.textContent = product.emoji || "🎁";
+        }
+
+        const name = document.createElement("h3");
+        name.textContent = product.name;
+
+        const price = document.createElement("div");
+        price.className = "price";
+        price.textContent = "💰 " + product.price;
+
+        const buy = document.createElement("button");
+        buy.className = "buy";
+        buy.textContent = "🛒 Купить";
+        buy.onclick = () => buyProduct(product);
+
+        card.append(visual, name, price, buy);
+
+        if (isAdmin) {
+            const edit = document.createElement("button");
+            edit.className = "edit";
+            edit.textContent = "✏️ Изменить";
+            edit.onclick = () => startEdit(product);
+
+            const remove = document.createElement("button");
+            remove.className = "delete";
+            remove.textContent = "🗑 Удалить";
+            remove.onclick = () => deleteProduct(product);
+
+            card.append(edit, remove);
+        }
+
+        container.appendChild(card);
     });
 }
 
-function buyProduct(name) {
-    const productsIds = {
-        "Лайтинг": "lighting",
-        "Шадоу": "shadow",
-        "Мамонт": "mammoth",
-        "Портал": "portal",
-        "Тесто": "dough",
-        "Газ": "gas",
-        "Брейнрот 1": "brainrot1",
-        "Брейнрот 2": "brainrot2",
-        "Брейнрот 3": "brainrot3"
+// Покупка
+
+function buyProduct(product) {
+    const orderData = {
+        n: String(product.name),
+        p: String(product.price)
     };
 
-    const productId = productsIds[name];
-
-    window.open(
-        "https://t.me/BloxShopLegend_bot?start=buy_" + productId,
-        "_blank"
+    // Кодируем информацию о товаре
+    const bytes = new TextEncoder().encode(
+        JSON.stringify(orderData)
     );
+
+    let binary = "";
+    bytes.forEach(byte => {
+        binary += String.fromCharCode(byte);
+    });
+
+    const payload = btoa(binary)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+    if (payload.length > 60) {
+        alert("Название или цена товара слишком длинные!");
+        return;
+    }
+
+    const url =
+    "https://t.me/BloxShopLegend_bot?start=order_" + payload;
+
+    if (tg) {
+        tg.openTelegramLink(url);
+    } else {
+        window.open(url, "_blank");
+    }
 }
-showProducts("blox", document.querySelector("nav button"));
+
+
+// Добавление или изменение товара
+async function saveProduct() {
+    if (!isAdmin) {
+        alert("Нет доступа!");
+        return;
+    }
+
+    if (!tg?.initData) {
+        alert("Открой магазин через Telegram!");
+        return;
+    }
+
+    const name = document.getElementById("productName").value.trim();
+    const price = document.getElementById("productPrice").value.trim();
+    const emoji = document.getElementById("productEmoji").value.trim();
+    const imageFileId = document.getElementById("productImageFileId").value.trim();
+    const category = document.getElementById("productCategory").value;
+
+    if (!name || !price) {
+        alert("Заполни название и цену!");
+        return;
+    }
+
+    const productData = {
+        name,
+        price,
+        emoji: emoji || "🎁",
+        category
+    };
+
+    // Если file_id не введён при редактировании, старая фотография сохраняется.
+    if (imageFileId) {
+        productData.image_file_id = imageFileId;
+    }
+
+    const body = JSON.stringify(productData);
+
+    const url = editingProductId
+        ? API_URL + "/api/products/" + editingProductId
+        : API_URL + "/api/products";
+
+    const method = editingProductId ? "PUT" : "POST";
+
+    try {
+        const response = await fetch(url, {
+            method,
+            headers: authHeaders(),
+            body
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || "Не удалось сохранить товар");
+        }
+
+        alert(editingProductId
+            ? "✅ Товар изменён!"
+            : "✅ Товар добавлен!");
+
+        cancelEdit();
+        await loadProducts();
+
+    } catch (error) {
+        console.error(error);
+        alert("❌ " + error.message);
+    }
+}
+
+// Начать редактирование
+function startEdit(product) {
+    editingProductId = product.id;
+
+    document.getElementById("productName").value = product.name;
+    document.getElementById("productPrice").value = product.price;
+    document.getElementById("productEmoji").value = product.emoji || "";
+    document.getElementById("productImageFileId").value = "";
+    document.getElementById("productCategory").value = product.category;
+
+    document.getElementById("saveButton").textContent = "💾 Сохранить";
+    document.getElementById("cancelButton").classList.remove("hidden");
+
+    document.getElementById("adminPanel")
+        .scrollIntoView({ behavior: "smooth" });
+}
+
+// Отмена редактирования
+function cancelEdit() {
+    editingProductId = null;
+
+    document.getElementById("productName").value = "";
+    document.getElementById("productPrice").value = "";
+    document.getElementById("productEmoji").value = "";
+    document.getElementById("productImageFileId").value = "";
+
+    document.getElementById("saveButton").textContent =
+        "➕ Добавить товар";
+
+    document.getElementById("cancelButton")
+        .classList.add("hidden");
+}
+
+// Удаление товара
+async function deleteProduct(product) {
+    if (!isAdmin) return;
+
+    if (!confirm("Удалить товар «" + product.name + "»?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            API_URL + "/api/products/" + product.id,
+            {
+                method: "DELETE",
+                headers: authHeaders()
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || "Ошибка удаления");
+        }
+
+        alert("🗑 Товар удалён!");
+        await loadProducts();
+
+    } catch (error) {
+        alert("❌ " + error.message);
+    }
+}
+
+loadProducts();
 </script>
 
 </body>
