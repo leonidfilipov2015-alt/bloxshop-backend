@@ -19,14 +19,13 @@ DB_PATH = "bloxshop.db"
 ADMIN_ID = int(os.environ.get("ADMIN_ID", "7580041056"))
 
 
-# Подключение к базе данных
 def connect_db():
     db = sqlite3.connect(DB_PATH)
     db.row_factory = sqlite3.Row
     return db
 
 
-# Создание таблицы и добавление поля для фотографий
+# Создание таблицы и добавление стартовых товаров
 def init_db():
     db = connect_db()
 
@@ -51,12 +50,39 @@ def init_db():
                 "ALTER TABLE products ADD COLUMN image_file_id TEXT"
             )
 
+        starter_products = [
+            ("Lightning", "25 Robux", "⚡", "blox"),
+            ("Shadow", "10 Robux", "🌑", "blox"),
+            ("Mammoth", "15 Robux", "🐘", "blox"),
+            ("Portal", "15 Robux", "🌀", "blox"),
+        ]
+
+        for name, price, emoji, category in starter_products:
+            exists = db.execute(
+                """
+                SELECT id FROM products
+                WHERE lower(name) = lower(?) AND category = ?
+                """,
+                (name, category)
+            ).fetchone()
+
+            if not exists:
+                db.execute(
+                    """
+                    INSERT INTO products
+                    (name, price, emoji, category)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (name, price, emoji, category)
+                )
+
         db.commit()
+
     finally:
         db.close()
 
 
-# Проверка Telegram Mini App
+# Проверка администратора через Telegram Mini App
 def check_telegram_admin():
     bot_token = os.environ.get("BOT_TOKEN")
 
@@ -117,7 +143,6 @@ def check_telegram_admin():
         return False
 
 
-# Защита действий администратора
 def admin_required(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
@@ -132,7 +157,7 @@ def admin_required(function):
     return wrapper
 
 
-# Разрешение запросов от Mini App
+# CORS
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -156,7 +181,7 @@ def home():
     return "Blox Shop backend работает!"
 
 
-# Получение всех товаров
+# Получение товаров
 @app.route("/api/products", methods=["GET"])
 def get_products():
     db = connect_db()
@@ -186,7 +211,7 @@ def get_products():
         db.close()
 
 
-# Получение фотографии товара через Telegram
+# Получение фотографии товара
 @app.route("/api/products/<int:product_id>/image", methods=["GET"])
 def product_image(product_id):
     bot_token = os.environ.get("BOT_TOKEN")
@@ -269,14 +294,14 @@ def add_product():
             "error": "Укажи название и цену"
         }), 400
 
+    if category not in ("blox", "brainrot"):
+        return jsonify({
+            "success": False,
+            "error": "Неверная категория"
+        }), 400
 
-if category not in ("blox", "brainrot"):
-    return jsonify({
-        "success": False,
-        "error": "Неверная категория"
-    }), 400
+    db = connect_db()
 
-db = connect_db()
     try:
         cursor = db.execute("""
             INSERT INTO products
@@ -314,6 +339,12 @@ def update_product(product_id):
         return jsonify({
             "success": False,
             "error": "Укажи название и цену"
+        }), 400
+
+    if category not in ("blox", "brainrot"):
+        return jsonify({
+            "success": False,
+            "error": "Неверная категория"
         }), 400
 
     db = connect_db()
