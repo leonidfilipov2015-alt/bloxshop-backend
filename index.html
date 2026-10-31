@@ -76,6 +76,30 @@ button:active {
     border-color: #a78aff;
     box-shadow: 0 0 18px #713cff55;
 }
+.search-box {
+    margin-bottom: 16px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 13px;
+    border: 1px solid #7955ff;
+    background: #171529;
+    color: white;
+    font-size: 16px;
+    outline: none;
+    box-shadow: 0 0 15px #713cff22;
+}
+
+.search-box input:focus {
+    border-color: #b89aff;
+    box-shadow: 0 0 15px #713cff66;
+}
+
+.search-box input::placeholder {
+    color: #aaa;
+}
 
 .products {
     display: grid;
@@ -250,6 +274,15 @@ footer {
         onclick="showProducts('brainrot')">🧠 Brainrot</button>
 </div>
 
+<div class="search-box">
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="🔎 Найти товар..."
+        oninput="showProducts(currentCategory)"
+    >
+</div>
+
 <div class="products" id="products">
     <div class="status">⏳ Загружаем товары...</div>
 </div>
@@ -357,9 +390,13 @@ function showProducts(category) {
     const container = document.getElementById("products");
     container.innerHTML = "";
 
-    const filtered = allProducts.filter(
-        product => product.category === category
-    );
+   const searchInput = document.getElementById("searchInput");
+const searchText = searchInput.value.trim().toLowerCase();
+
+const filtered = allProducts.filter(product =>
+    product.category === category &&
+    product.name.toLowerCase().includes(searchText)
+);
 
     if (filtered.length === 0) {
         container.innerHTML =
