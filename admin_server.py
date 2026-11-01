@@ -5,50 +5,52 @@ import hmac
 import json
 import time
 import hashlib
-import sqlite3
 import mimetypes
 import urllib.request
 import urllib.parse
+
+import psycopg
+from psycopg.rows import dict_row
 
 from functools import wraps
 from flask import Flask, jsonify, request, send_file
 
 app = Flask(__name__)
 
-DB_PATH = "bloxshop.db"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 ADMIN_ID = int(os.environ.get("ADMIN_ID", "7580041056"))
 
 
 def connect_db():
-    db = sqlite3.connect(DB_PATH)
-    db.row_factory = sqlite3.Row
-    return db
+    if not DATABASE_URL:
+        raise RuntimeError("Не задана переменная DATABASE_URL в Render")
+
+    return psycopg.connect(
+        DATABASE_URL,
+        row_factory=dict_row,
+        connect_timeout=10
+    )
 
 
-# Создание таблицы и добавление стартовых товаров
 def init_db():
     db = connect_db()
 
     try:
         db.execute("""
             CREATE TABLE IF NOT EXISTS products (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id BIGSERIAL PRIMARY KEY,
                 name TEXT NOT NULL,
                 price TEXT NOT NULL,
                 emoji TEXT,
-                category TEXT
+                category TEXT,
+                image_file_id TEXT
             )
         """)
 
-        columns = [
-            row["name"]
-            for row in db.execute("PRAGMA table_info(products)").fetchall()
-        ]
-
-        if "image_file_id" not in columns:
-            db.execute(
-                "ALTER TABLE products ADD COLUMN image_file_id TEXT"
-            )
+        db.execute("""
+            ALTER TABLE products
+            ADD COLUMN IF NOT EXISTS image_file_id TEXT
+        """)
 
         starter_products = [
             ("Lightning", "25 Robux", "⚡", "blox"),
@@ -61,7 +63,8 @@ def init_db():
             exists = db.execute(
                 """
                 SELECT id FROM products
-                WHERE lower(name) = lower(?) AND category = ?
+                WHERE lower(name) = lower(%s) AND category = %s
+                LIMIT 1
                 """,
                 (name, category)
             ).fetchone()
@@ -71,18 +74,20 @@ def init_db():
                     """
                     INSERT INTO products
                     (name, price, emoji, category)
-                    VALUES (?, ?, ?, ?)
+                    VALUES (%s, %s, %s, %s)
                     """,
                     (name, price, emoji, category)
                 )
 
         db.commit()
 
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
 
 
-# Проверка администратора через Telegram Mini App
 def check_telegram_admin():
     bot_token = os.environ.get("BOT_TOKEN")
 
@@ -157,7 +162,6 @@ def admin_required(function):
     return wrapper
 
 
-# CORS
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -178,10 +182,9 @@ def handle_options():
 
 @app.route("/")
 def home():
-    return "Blox Shop backend работает!"
+    return "Blox Shop backend работает с Neon!"
 
 
-# Получение товаров
 @app.route("/api/products", methods=["GET"])
 def get_products():
     db = connect_db()
@@ -211,7 +214,6 @@ def get_products():
         db.close()
 
 
-# Получение фотографии товара
 @app.route("/api/products/<int:product_id>/image", methods=["GET"])
 def product_image(product_id):
     bot_token = os.environ.get("BOT_TOKEN")
@@ -223,7 +225,7 @@ def product_image(product_id):
 
     try:
         row = db.execute(
-            "SELECT image_file_id FROM products WHERE id = ?",
+            "SELECT image_file_id FROM products WHERE id = %s",
             (product_id,)
         ).fetchone()
     finally:
@@ -276,7 +278,6 @@ def product_image(product_id):
         return jsonify({"error": "Не удалось загрузить фотографию"}), 502
 
 
-# Добавление товара
 @app.route("/api/products", methods=["POST"])
 @admin_required
 def add_product():
@@ -303,24 +304,27 @@ def add_product():
     db = connect_db()
 
     try:
-        cursor = db.execute("""
+        row = db.execute("""
             INSERT INTO products
             (name, price, emoji, category, image_file_id)
-            VALUES (?, ?, ?, ?, ?)
-        """, (name, price, emoji, category, image_file_id))
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING id
+        """, (name, price, emoji, category, image_file_id)).fetchone()
 
         db.commit()
 
         return jsonify({
             "success": True,
-            "id": cursor.lastrowid
+            "id": row["id"]
         })
 
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
 
 
-# Изменение товара
 @app.route("/api/products/<int:product_id>", methods=["PUT"])
 @admin_required
 def update_product(product_id):
@@ -353,15 +357,15 @@ def update_product(product_id):
         if image_file_id is None:
             db.execute("""
                 UPDATE products
-                SET name = ?, price = ?, emoji = ?, category = ?
-                WHERE id = ?
+                SET name = %s, price = %s, emoji = %s, category = %s
+                WHERE id = %s
             """, (name, price, emoji, category, product_id))
         else:
             db.execute("""
                 UPDATE products
-                SET name = ?, price = ?, emoji = ?, category = ?,
-                    image_file_id = ?
-                WHERE id = ?
+                SET name = %s, price = %s, emoji = %s, category = %s,
+                    image_file_id = %s
+                WHERE id = %s
             """, (
                 name, price, emoji, category,
                 image_file_id, product_id
@@ -371,11 +375,13 @@ def update_product(product_id):
 
         return jsonify({"success": True})
 
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
 
 
-# Удаление товара
 @app.route("/api/products/<int:product_id>", methods=["DELETE"])
 @admin_required
 def delete_product(product_id):
@@ -383,7 +389,7 @@ def delete_product(product_id):
 
     try:
         db.execute(
-            "DELETE FROM products WHERE id = ?",
+            "DELETE FROM products WHERE id = %s",
             (product_id,)
         )
 
@@ -391,6 +397,9 @@ def delete_product(product_id):
 
         return jsonify({"success": True})
 
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
 

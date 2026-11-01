@@ -1,2 +1,4 @@
-flask
+Flask
 gunicorn
+python-telegram-bot
+psycopg[binary]>=3.2
