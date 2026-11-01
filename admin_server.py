@@ -1,4 +1,3 @@
-
 import os
 import io
 import hmac
@@ -8,17 +7,18 @@ import hashlib
 import mimetypes
 import urllib.request
 import urllib.parse
+from functools import wraps
 
 import psycopg
 from psycopg.rows import dict_row
-
-from functools import wraps
 from flask import Flask, jsonify, request, send_file
 
 app = Flask(__name__)
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 ADMIN_ID = int(os.environ.get("ADMIN_ID", "7580041056"))
+
+ALLOWED_CATEGORIES = ("blox", "brainrot", "help", "reviews")
 
 
 def connect_db():
@@ -43,13 +43,19 @@ def init_db():
                 price TEXT NOT NULL,
                 emoji TEXT,
                 category TEXT,
-                image_file_id TEXT
+                image_file_id TEXT,
+                description TEXT
             )
         """)
 
         db.execute("""
             ALTER TABLE products
             ADD COLUMN IF NOT EXISTS image_file_id TEXT
+        """)
+
+        db.execute("""
+            ALTER TABLE products
+            ADD COLUMN IF NOT EXISTS description TEXT
         """)
 
         starter_products = [
@@ -60,24 +66,19 @@ def init_db():
         ]
 
         for name, price, emoji, category in starter_products:
-            exists = db.execute(
-                """
+            exists = db.execute("""
                 SELECT id FROM products
-                WHERE lower(name) = lower(%s) AND category = %s
+                WHERE lower(name) = lower(%s)
+                AND category = %s
                 LIMIT 1
-                """,
-                (name, category)
-            ).fetchone()
+            """, (name, category)).fetchone()
 
             if not exists:
-                db.execute(
-                    """
+                db.execute("""
                     INSERT INTO products
                     (name, price, emoji, category)
                     VALUES (%s, %s, %s, %s)
-                    """,
-                    (name, price, emoji, category)
-                )
+                """, (name, price, emoji, category))
 
         db.commit()
 
@@ -90,13 +91,9 @@ def init_db():
 
 def check_telegram_admin():
     bot_token = os.environ.get("BOT_TOKEN")
-
-    if not bot_token:
-        return False
-
     init_data = request.headers.get("X-Telegram-Init-Data", "")
 
-    if not init_data:
+    if not bot_token or not init_data:
         return False
 
     try:
@@ -133,11 +130,12 @@ def check_telegram_admin():
             return False
 
         auth_date = int(parsed.get("auth_date", "0"))
+        now = time.time()
 
-        if time.time() - auth_date > 86400:
+        if now - auth_date > 86400:
             return False
 
-        if auth_date > time.time() + 60:
+        if auth_date > now + 60:
             return False
 
         user = json.loads(parsed.get("user", "{}"))
@@ -265,7 +263,9 @@ def product_image(product_id):
             content_type = response.headers.get("Content-Type")
 
         if not content_type or not content_type.startswith("image/"):
-            content_type = mimetypes.guess_type(file_path)[0] or "image/jpeg"
+            content_type = (
+                mimetypes.guess_type(file_path)[0] or "image/jpeg"
+            )
 
         return send_file(
             io.BytesIO(image_bytes),
@@ -275,7 +275,44 @@ def product_image(product_id):
 
     except Exception as error:
         print("Ошибка получения фотографии:", error)
-        return jsonify({"error": "Не удалось загрузить фотографию"}), 502
+
+        return jsonify({
+            "error": "Не удалось загрузить фотографию"
+        }), 502
+
+
+def validate_product_data(data):
+    name = str(data.get("name", "")).strip()
+    price = str(data.get("price", "")).strip()
+    emoji = str(data.get("emoji", "🎁")).strip() or "🎁"
+    category = str(data.get("category", "blox")).strip()
+    description = str(data.get("description", "")).strip()
+
+    image_file_id = data.get("image_file_id")
+
+    if image_file_id is not None:
+        image_file_id = str(image_file_id).strip() or None
+
+    if not name:
+        return None, "Укажи название"
+
+    if not price and category != "reviews":
+        return None, "Укажи цену"
+
+    if not price:
+        price = "Отзыв"
+
+    if category not in ALLOWED_CATEGORIES:
+        return None, "Неверная категория"
+
+    return {
+        "name": name,
+        "price": price,
+        "emoji": emoji,
+        "category": category,
+        "description": description,
+        "image_file_id": image_file_id
+    }, None
 
 
 @app.route("/api/products", methods=["POST"])
@@ -283,22 +320,12 @@ def product_image(product_id):
 def add_product():
     data = request.get_json(silent=True) or {}
 
-    name = str(data.get("name", "")).strip()
-    price = str(data.get("price", "")).strip()
-    emoji = str(data.get("emoji", "🎁")).strip()
-    category = str(data.get("category", "blox")).strip()
-    image_file_id = str(data.get("image_file_id", "")).strip() or None
+    product, error = validate_product_data(data)
 
-    if not name or not price:
+    if error:
         return jsonify({
             "success": False,
-            "error": "Укажи название и цену"
-        }), 400
-
-    if category not in ("blox", "brainrot"):
-        return jsonify({
-            "success": False,
-            "error": "Неверная категория"
+            "error": error
         }), 400
 
     db = connect_db()
@@ -306,10 +333,17 @@ def add_product():
     try:
         row = db.execute("""
             INSERT INTO products
-            (name, price, emoji, category, image_file_id)
-            VALUES (%s, %s, %s, %s, %s)
+            (name, price, emoji, category, image_file_id, description)
+            VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING id
-        """, (name, price, emoji, category, image_file_id)).fetchone()
+        """, (
+            product["name"],
+            product["price"],
+            product["emoji"],
+            product["category"],
+            product["image_file_id"],
+            product["description"]
+        )).fetchone()
 
         db.commit()
 
@@ -321,6 +355,7 @@ def add_product():
     except Exception:
         db.rollback()
         raise
+
     finally:
         db.close()
 
@@ -330,45 +365,52 @@ def add_product():
 def update_product(product_id):
     data = request.get_json(silent=True) or {}
 
-    name = str(data.get("name", "")).strip()
-    price = str(data.get("price", "")).strip()
-    emoji = str(data.get("emoji", "🎁")).strip()
-    category = str(data.get("category", "blox")).strip()
+    product, error = validate_product_data(data)
 
-    image_file_id = data.get("image_file_id")
-    if image_file_id is not None:
-        image_file_id = str(image_file_id).strip() or None
-
-    if not name or not price:
+    if error:
         return jsonify({
             "success": False,
-            "error": "Укажи название и цену"
-        }), 400
-
-    if category not in ("blox", "brainrot"):
-        return jsonify({
-            "success": False,
-            "error": "Неверная категория"
+            "error": error
         }), 400
 
     db = connect_db()
 
     try:
-        if image_file_id is None:
+        if "image_file_id" in data:
             db.execute("""
                 UPDATE products
-                SET name = %s, price = %s, emoji = %s, category = %s
-                WHERE id = %s
-            """, (name, price, emoji, category, product_id))
-        else:
-            db.execute("""
-                UPDATE products
-                SET name = %s, price = %s, emoji = %s, category = %s,
+                SET name = %s,
+                    price = %s,
+                    emoji = %s,
+                    category = %s,
+                    description = %s,
                     image_file_id = %s
                 WHERE id = %s
             """, (
-                name, price, emoji, category,
-                image_file_id, product_id
+                product["name"],
+                product["price"],
+                product["emoji"],
+                product["category"],
+                product["description"],
+                product["image_file_id"],
+                product_id
+            ))
+        else:
+            db.execute("""
+                UPDATE products
+                SET name = %s,
+                    price = %s,
+                    emoji = %s,
+                    category = %s,
+                    description = %s
+                WHERE id = %s
+            """, (
+                product["name"],
+                product["price"],
+                product["emoji"],
+                product["category"],
+                product["description"],
+                product_id
             ))
 
         db.commit()
@@ -378,6 +420,7 @@ def update_product(product_id):
     except Exception:
         db.rollback()
         raise
+
     finally:
         db.close()
 
@@ -400,6 +443,7 @@ def delete_product(product_id):
     except Exception:
         db.rollback()
         raise
+
     finally:
         db.close()
 

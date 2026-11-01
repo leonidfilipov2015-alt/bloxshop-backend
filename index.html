@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,329 +6,144 @@
 <meta name="theme-color" content="#10101c">
 <title>Blox Shop</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    padding: 16px;
-    background:
-        radial-gradient(ellipse at top, #29205a 0%, transparent 50%),
-        #090912;
-    color: white;
-    font-family: Arial, sans-serif;
-}
-
-.header {
-    text-align: center;
-    padding: 28px 15px;
-    background: linear-gradient(135deg, #713cff, #24104d, #11152e);
-    border: 1px solid #7955ff;
-    border-radius: 22px;
-    margin-bottom: 22px;
-    box-shadow: 0 8px 35px #713cff35;
-}
-
-.header h1 {
-    margin: 5px;
-    font-size: 32px;
-    letter-spacing: 2px;
-    text-shadow: 0 0 15px #b89aff;
-}
-
-.header p {
-    color: #ded5ff;
-}
-
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-button {
-    cursor: pointer;
-    border: none;
-    color: white;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-button:active {
-    transform: scale(0.96);
-}
-
-.tab {
-    flex: 1;
-    padding: 15px 5px;
-    background: #1c1b30;
-    border: 1px solid #393454;
-    border-radius: 13px;
-}
-
-.tab.active {
-    background: linear-gradient(135deg, #8955ff, #5425cf);
-    border-color: #a78aff;
-    box-shadow: 0 0 18px #713cff55;
-}
-.search-box {
-    margin-bottom: 16px;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 15px;
-    border-radius: 13px;
-    border: 1px solid #7955ff;
-    background: #171529;
-    color: white;
-    font-size: 16px;
-    outline: none;
-    box-shadow: 0 0 15px #713cff22;
-}
-
-.search-box input:focus {
-    border-color: #b89aff;
-    box-shadow: 0 0 15px #713cff66;
-}
-
-.search-box input::placeholder {
-    color: #aaa;
-}
-
-.products {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
-}
-
-.product {
-    background: linear-gradient(160deg, #25243d, #151522);
-    border: 1px solid #40375f;
-    border-radius: 19px;
-    padding: 12px 10px;
-    text-align: center;
-    min-width: 0;
-    box-shadow: 0 5px 20px #0005;
-    transition: 0.2s;
-}
-
-.product:active {
-    transform: scale(0.98);
-}
-
-.emoji {
-    font-size: 52px;
-    margin: 12px;
-    filter: drop-shadow(0 0 10px #8955ff);
-}
-
-.product-image {
-    width: 100%;
-    height: 155px;
-    object-fit: contain;
-    border-radius: 13px;
-    margin: 4px 0 10px;
-    background: #11111e;
-}
-
-.product h3 {
-    font-size: 16px;
-    overflow-wrap: anywhere;
-    min-height: 36px;
-}
-
-.price {
-    color: #c3a4ff;
-    font-size: 16px;
-    font-weight: bold;
-    margin: 13px 0;
-    text-shadow: 0 0 10px #8955ff55;
-}
-
-.buy, .admin-button {
-    width: 100%;
-    padding: 13px 8px;
-    background: linear-gradient(135deg, #914fff, #5425d5);
-    border: 1px solid #a17aff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px #713cff40;
-}
-
-.buy:active, .admin-button:active {
-    background: #5425d5;
-}
-
-.status {
-    text-align: center;
-    color: #aaa;
-    padding: 30px 10px;
-    grid-column: 1 / -1;
-}
-
-.admin {
-    margin-top: 26px;
-    padding: 17px;
-    background: linear-gradient(145deg, #24213d, #151522);
-    border: 1px solid #8955ff;
-    border-radius: 19px;
-    box-shadow: 0 0 25px #713cff25;
-}
-
-.admin h2 {
-    text-align: center;
-    color: #c9adff;
-}
-
-.admin input, .admin select {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    margin: 11px 0;
-    border-radius: 11px;
-    border: 1px solid #494064;
-    background: #11111e;
-    color: white;
-    outline: none;
-}
-
-.admin input:focus, .admin select:focus {
-    border-color: #8955ff;
-    box-shadow: 0 0 10px #713cff44;
-}
-
-.admin-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.admin-actions button {
-    flex: 1;
-}
-
-.secondary {
-    background: #45455c !important;
-}
-
-.edit, .delete {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    border-radius: 9px;
-}
-
-.edit {
-    background: #4545a0;
-}
-
-.delete {
-    background: #a83248;
-}
-
-.hidden {
-    display: none !important;
-}
-
-footer {
-    text-align: center;
-    color: #777;
-    margin-top: 30px;
-    padding: 15px;
-    font-size: 12px;
-}
-
-@media (max-width: 350px) {
-    .products {
-        gap: 8px;
-    }
-
-    .product {
-        padding: 9px 6px;
-    }
-
-    .product-image {
-        height: 120px;
-    }
-}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:radial-gradient(ellipse at top,#29205a 0%,transparent 50%),#090912;color:white;font-family:Arial,sans-serif}
+.header{text-align:center;padding:28px 15px;background:linear-gradient(135deg,#713cff,#24104d,#11152e);border:1px solid #7955ff;border-radius:22px;margin-bottom:22px;box-shadow:0 8px 35px #713cff35}
+.header h1{margin:5px;font-size:32px;letter-spacing:2px;text-shadow:0 0 15px #b89aff}
+.header p{color:#ded5ff}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{flex:1;padding:13px 4px;background:#1c1b30;border:1px solid #393454;border-radius:13px;font-size:13px}
+button{cursor:pointer;border:none;color:white;font-weight:bold;transition:.2s}
+button:active{transform:scale(.97)}
+.tab.active{background:linear-gradient(135deg,#8955ff,#5425cf);border-color:#a78aff;box-shadow:0 0 18px #713cff55}
+.admin-toggle{display:block;width:100%;padding:13px;margin:0 0 18px;border-radius:12px;border:1px solid #a17aff;background:linear-gradient(135deg,#39305e,#211a3b);box-shadow:0 4px 15px #713cff30}
+.admin-toggle.active{background:linear-gradient(135deg,#8955ff,#5425cf)}
+.search-box{margin-bottom:16px}
+.search-box input{width:100%;padding:15px;border-radius:13px;border:1px solid #7955ff;background:#171529;color:white;font-size:16px;outline:none}
+.search-box input::placeholder{color:#aaa}
+.clear-search{width:100%;margin-top:8px;padding:10px;background:#292344;border-radius:10px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.product{background:linear-gradient(160deg,#25243d,#151522);border:1px solid #40375f;border-radius:19px;padding:12px 10px;text-align:center;min-width:0;box-shadow:0 5px 20px #0005}
+.emoji{font-size:52px;margin:12px;filter:drop-shadow(0 0 10px #8955ff)}
+.product-image{width:100%;height:155px;object-fit:contain;border-radius:13px;margin:4px 0 10px;background:#11111e}
+.product h3{font-size:16px;overflow-wrap:anywhere;min-height:36px}
+.price{color:#c3a4ff;font-size:16px;font-weight:bold;margin:13px 0}
+.buy,.admin-button,.details{width:100%;padding:13px 8px;background:linear-gradient(135deg,#914fff,#5425d5);border:1px solid #a17aff;border-radius:12px;box-shadow:0 4px 15px #713cff40}
+.details{margin-bottom:8px;background:linear-gradient(135deg,#494078,#30234e)}
+.status{text-align:center;color:#aaa;padding:30px 10px;grid-column:1/-1}
+.admin{margin-top:22px;margin-bottom:22px;padding:17px;background:linear-gradient(145deg,#24213d,#151522);border:1px solid #8955ff;border-radius:19px;box-shadow:0 0 25px #713cff25}
+.admin h2{text-align:center;color:#c9adff;margin-top:4px}
+.admin-description{text-align:center;color:#aaa;font-size:14px}
+.admin input,.admin select,.admin textarea{display:block;width:100%;padding:14px;margin:11px 0;border-radius:11px;border:1px solid #494064;background:#11111e;color:white;outline:none;font:inherit}
+.admin textarea{min-height:100px;resize:vertical}
+.admin-actions{display:flex;gap:8px}
+.admin-actions button{flex:1}
+.secondary{background:#45455c!important}
+.edit,.delete{width:100%;padding:10px;margin-top:8px;border-radius:9px}
+.edit{background:#4545a0}.delete{background:#a83248}
+.hidden{display:none!important}
+.help-subtabs{display:flex;gap:8px;margin:0 0 14px}
+.help-subtabs button{flex:1;padding:11px 5px;border-radius:11px;background:#201d35;border:1px solid #494064}
+.help-subtabs button.active{background:#6b3bd4;border-color:#a17aff}
+.contact-box{margin-top:18px;padding:16px;text-align:center;background:#1b1830;border:1px solid #494064;border-radius:15px;color:#ddd}
+.contact-box a{color:#c3a4ff;text-decoration:none;font-weight:bold}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal-card{width:100%;max-width:440px;max-height:85vh;overflow:auto;background:linear-gradient(160deg,#292544,#12121f);border:1px solid #8955ff;border-radius:20px;padding:20px;box-shadow:0 10px 40px #0009}
+.modal-card h2{text-align:center;color:#d7c5ff}
+.modal-description{white-space:pre-wrap;line-height:1.5;color:#eee}
+.modal-actions{display:flex;gap:9px;margin-top:18px}
+.modal-actions button{flex:1}
+.close{background:#45455c;border-radius:11px;padding:13px}
+footer{text-align:center;color:#777;margin-top:30px;padding:15px;font-size:12px}
+@media(max-width:380px){body{padding:11px}.tabs{gap:5px}.tab{font-size:11px;padding:12px 2px}.products{gap:8px}.product{padding:9px 6px}.product-image{height:120px}.header h1{font-size:27px}}
 </style>
 </head>
-
 <body>
 
 <div class="header">
-    <h1>🔥 BLOX SHOP</h1>
-    <p>Магазин Blox Fruits и Steal a Brainrot</p>
-    <p>🛒 Лучшие товары по хорошим ценам!</p>
+ <h1>🔥 BLOX SHOP</h1>
+ <p>Магазин Blox Fruits и Steal a Brainrot</p>
+ <p>🛒 Лучшие товары по хорошим ценам!</p>
 </div>
 
 <div class="tabs">
-    <button class="tab active" id="bloxTab"
-        onclick="showProducts('blox')">🍎 Blox Fruits</button>
-
-    <button class="tab" id="brainrotTab"
-        onclick="showProducts('brainrot')">🧠 Brainrot</button>
+ <button class="tab active" id="bloxTab" onclick="showProducts('blox')">🍎 Blox Fruits</button>
+ <button class="tab" id="brainrotTab" onclick="showProducts('brainrot')">🧠 Brainrot</button>
+ <button class="tab" id="helpTab" onclick="showProducts('help')">🛠 Помощь по БФ</button>
 </div>
 
-<div class="search-box">
-    <input
-        type="text"
-        id="searchInput"
-        placeholder="🔎 Найти товар..."
-        oninput="showProducts(currentCategory)"
-    >
+<button class="admin-toggle hidden" id="adminToggle" onclick="toggleAdminPanel()">⚙️ Открыть админку</button>
 
-    <button
-        onclick="clearSearch()"
-        style="width:100%; margin-top:8px; padding:10px;
-        background:#292344; border-radius:10px;">
-        ❌ Очистить поиск
-    </button>
+<div class="search-box">
+ <input type="text" id="searchInput" placeholder="🔎 Найти товар или услугу..." oninput="showProducts(currentCategory)">
+ <button class="clear-search" onclick="clearSearch()">❌ Очистить поиск</button>
+</div>
+
+<div id="helpSubtabs" class="help-subtabs hidden">
+ <button id="servicesTab" class="active" onclick="showHelpSection('help')">🛠 Услуги</button>
+ <button id="reviewsTab" onclick="showHelpSection('reviews')">⭐ Отзывы</button>
 </div>
 
 <div class="products" id="products">
-    <div class="status">⏳ Загружаем товары...</div>
+ <div class="status">⏳ Загружаем товары...</div>
+</div>
+
+<div class="contact-box hidden" id="helpContacts">
+ <b>💯 Честно · ⚡ Быстро · 🤝 Без обмана</b><br><br>
+ Можем договориться о цене<br>
+ 📩 Пишите в личные сообщения:<br>
+ <a href="https://t.me/Legendjhnb" onclick="openContact(event, 'Legendjhnb')">@Legendjhnb</a>
+ &nbsp;·&nbsp;
+ <a href="https://t.me/Wqbvmp" onclick="openContact(event, 'Wqbvmp')">@Wqbvmp</a>
 </div>
 
 <div class="admin hidden" id="adminPanel">
-    <h2>⚙️ Панель администратора</h2>
-    <p style="text-align:center;color:#aaa">
-        Управление товарами магазина
-    </p>
+ <h2>⚙️ Панель администратора</h2>
+ <p class="admin-description">Управление товарами, услугами и отзывами</p>
 
-    <input id="productName" placeholder="Название товара">
-    <input id="productPrice" placeholder="Цена товара">
-    <input id="productEmoji" placeholder="Эмодзи, например 🍎">
-    <input id="productImageFileId" placeholder="Telegram file_id фотографии (необязательно)">
+ <input id="productName" placeholder="Название товара или услуги" maxlength="100">
+ <input id="productPrice" placeholder="Цена (например: Тесто или 25 Robux)" maxlength="100">
+ <input id="productEmoji" placeholder="Эмодзи, например 🍎" maxlength="10">
+ <input id="productImageFileId" placeholder="Telegram file_id фотографии (необязательно)">
+ <textarea id="productDescription" placeholder="Подробное описание услуги (необязательно)"></textarea>
 
-    <select id="productCategory">
-        <option value="blox">Blox Fruits</option>
-        <option value="brainrot">Steal a Brainrot</option>
-    </select>
+ <select id="productCategory">
+  <option value="blox">Blox Fruits</option>
+  <option value="brainrot">Steal a Brainrot</option>
+  <option value="help">Помощь по БФ — услуги</option>
+  <option value="reviews">Помощь по БФ — отзывы</option>
+ </select>
 
-    <div class="admin-actions">
-        <button class="admin-button" id="saveButton"
-            onclick="saveProduct()">➕ Добавить товар</button>
-
-        <button class="admin-button secondary hidden"
-            id="cancelButton" onclick="cancelEdit()">Отмена</button>
-    </div>
-
-    <p id="adminMessage" style="text-align:center;color:#aaa"></p>
+ <div class="admin-actions">
+  <button class="admin-button" id="saveButton" onclick="saveProduct()">➕ Добавить</button>
+  <button class="admin-button secondary hidden" id="cancelButton" onclick="cancelEdit()">Отмена</button>
+ </div>
+ <p id="adminMessage" class="admin-description"></p>
 </div>
 
-<footer>Blox Shop 2.0 © 2026</footer>
+<div id="detailsModal" class="modal hidden" onclick="if(event.target===this)closeDetails()">
+ <div class="modal-card">
+  <h2 id="modalTitle"></h2>
+  <div class="price" id="modalPrice"></div>
+  <div class="modal-description" id="modalDescription"></div>
+  <div class="modal-actions">
+   <button class="buy" id="modalOrderButton">📩 Заказать</button>
+   <button class="close" onclick="closeDetails()">Закрыть</button>
+  </div>
+ </div>
+</div>
+
+<footer>Blox Shop © 2026</footer>
 
 <script>
 const tg = window.Telegram?.WebApp;
 
 if (tg) {
-    tg.ready();
-    tg.expand();
-    tg.setHeaderColor("#10101c");
-    tg.setBackgroundColor("#10101c");
+ tg.ready();
+ tg.expand();
+ tg.setHeaderColor("#10101c");
+ tg.setBackgroundColor("#10101c");
 }
 
 const API_URL = "https://bloxshop-backend.onrender.com";
@@ -337,315 +151,428 @@ const ADMIN_ID = 7580041056;
 
 let allProducts = [];
 let currentCategory = "blox";
+let currentHelpSection = "help";
 let editingProductId = null;
 
-const isAdmin =
-    Number(tg?.initDataUnsafe?.user?.id) === ADMIN_ID;
+const isAdmin = Number(tg?.initDataUnsafe?.user?.id) === ADMIN_ID;
 
 if (isAdmin) {
-    document.getElementById("adminPanel")
-        .classList.remove("hidden");
+ document.getElementById("adminToggle").classList.remove("hidden");
+}
+
+function openContact(event, username) {
+ event.preventDefault();
+ const url = "https://t.me/" + username;
+
+ if (tg) {
+  tg.openTelegramLink(url);
+ } else {
+  window.open(url, "_blank");
+ }
+}
+
+function toggleAdminPanel() {
+ if (!isAdmin) return;
+
+ const panel = document.getElementById("adminPanel");
+ const toggle = document.getElementById("adminToggle");
+ const opening = panel.classList.contains("hidden");
+
+ panel.classList.toggle("hidden", !opening);
+ toggle.classList.toggle("active", opening);
+ toggle.textContent = opening ? "✖️ Закрыть админку" : "⚙️ Открыть админку";
+
+ if (opening) {
+  panel.scrollIntoView({behavior:"smooth",block:"start"});
+ } else {
+  cancelEdit();
+ }
 }
 
 function authHeaders() {
-    return {
-        "Content-Type": "application/json",
-        "X-Telegram-Init-Data": tg?.initData || ""
-    };
+ return {
+  "Content-Type":"application/json",
+  "X-Telegram-Init-Data":tg?.initData || ""
+ };
 }
 
-// Загрузка товаров
 async function loadProducts() {
-    const container = document.getElementById("products");
-    container.innerHTML =
-        '<div class="status">⏳ Загружаем товары...</div>';
+ const container = document.getElementById("products");
+ container.innerHTML = '<div class="status">⏳ Загружаем товары...</div>';
 
-    try {
-        const response = await fetch(API_URL + "/api/products");
+ try {
+  const response = await fetch(API_URL + "/api/products");
 
-        if (!response.ok) {
-            throw new Error("Ошибка сервера: " + response.status);
-        }
+  if (!response.ok) {
+   throw new Error("Ошибка сервера: " + response.status);
+  }
 
-        const data = await response.json();
+  const data = await response.json();
+  allProducts = Array.isArray(data) ? data : (data.products || []);
 
-        allProducts = Array.isArray(data)
-            ? data
-            : (data.products || []);
+  showProducts(currentCategory);
 
-        showProducts(currentCategory);
+ } catch(error) {
+  console.error(error);
 
-    } catch (error) {
-        console.error(error);
-        container.innerHTML =
-            '<div class="status">❌ Ошибка загрузки товаров.<br><br>' +
-            '<button class="buy" onclick="loadProducts()">🔄 Повторить</button></div>';
-    }
+  container.innerHTML =
+   '<div class="status">❌ Ошибка загрузки.<br><br><button class="buy" onclick="loadProducts()">🔄 Повторить</button></div>';
+ }
 }
 
-// Отображение товаров
 function showProducts(category) {
-    currentCategory = category;
+ currentCategory = category;
 
-    document.getElementById("bloxTab")
-        .classList.toggle("active", category === "blox");
+ document.getElementById("bloxTab").classList.toggle("active",category==="blox");
+ document.getElementById("brainrotTab").classList.toggle("active",category==="brainrot");
+ document.getElementById("helpTab").classList.toggle("active",category==="help");
 
-    document.getElementById("brainrotTab")
-        .classList.toggle("active", category === "brainrot");
+ document.getElementById("helpSubtabs").classList.toggle("hidden",category!=="help");
+ document.getElementById("helpContacts").classList.toggle("hidden",category!=="help");
 
-    const container = document.getElementById("products");
-    container.innerHTML = "";
+ if (category==="help") {
+  showHelpSection(currentHelpSection);
+  return;
+ }
 
-   const searchInput = document.getElementById("searchInput");
-const searchText = searchInput.value.trim().toLowerCase();
-
-const filtered = allProducts.filter(product =>
-    product.category === category &&
-    product.name.toLowerCase().includes(searchText)
-);
-
-   if (filtered.length === 0) {
-    container.innerHTML = searchText
-        ? '<div class="status">🔎 Товар не найден. Попробуй другое название!</div>'
-        : '<div class="status">📦 В этой категории пока нет товаров.</div>';
-    return;
+ renderCategory(category);
 }
 
-    filtered.forEach(product => {
-        const card = document.createElement("div");
-        card.className = "product";
+function showHelpSection(section) {
+ currentHelpSection = section;
 
-        let visual;
+ document.getElementById("servicesTab").classList.toggle("active",section==="help");
+ document.getElementById("reviewsTab").classList.toggle("active",section==="reviews");
 
-        if (product.image_url) {
-            visual = document.createElement("img");
-            visual.className = "product-image";
-            visual.src = product.image_url;
-            visual.alt = product.name || "Фото товара";
-            visual.loading = "lazy";
-            visual.onerror = () => {
-                visual.remove();
-                const fallback = document.createElement("div");
-                fallback.className = "emoji";
-                fallback.textContent = product.emoji || "🎁";
-                card.insertBefore(fallback, name);
-            };
-        } else {
-            visual = document.createElement("div");
-            visual.className = "emoji";
-            visual.textContent = product.emoji || "🎁";
-        }
-
-        const name = document.createElement("h3");
-        name.textContent = product.name;
-
-        const price = document.createElement("div");
-        price.className = "price";
-        price.textContent = "💰 " + product.price;
-
-        const buy = document.createElement("button");
-        buy.className = "buy";
-        buy.textContent = "🛒 Купить";
-        buy.onclick = () => buyProduct(product);
-
-        card.append(visual, name, price, buy);
-
-        if (isAdmin) {
-            const edit = document.createElement("button");
-            edit.className = "edit";
-            edit.textContent = "✏️ Изменить";
-            edit.onclick = () => startEdit(product);
-
-            const remove = document.createElement("button");
-            remove.className = "delete";
-            remove.textContent = "🗑 Удалить";
-            remove.onclick = () => deleteProduct(product);
-
-            card.append(edit, remove);
-        }
-
-        container.appendChild(card);
-    });
+ renderCategory(section);
 }
 
-// Покупка
+function renderCategory(category) {
+ const container = document.getElementById("products");
+ container.innerHTML = "";
+
+ const searchText = document.getElementById("searchInput").value.trim().toLowerCase();
+
+ const filtered = allProducts.filter(p =>
+  p.category===category &&
+  (
+   String(p.name||"").toLowerCase().includes(searchText) ||
+   String(p.description||"").toLowerCase().includes(searchText)
+  )
+ );
+
+ if (!filtered.length) {
+  container.innerHTML =
+   '<div class="status">'+(searchText?'🔎 Ничего не найдено.':'📦 Здесь пока пусто. Добавь записи через админку!')+'</div>';
+  return;
+ }
+
+ filtered.forEach(product => {
+  const card = document.createElement("div");
+  card.className = "product";
+
+  let visual;
+
+  if (product.image_url) {
+   visual = document.createElement("img");
+   visual.className = "product-image";
+   visual.src = product.image_url;
+   visual.alt = product.name || "Фото";
+   visual.loading = "lazy";
+
+   visual.onerror = () => {
+    visual.remove();
+    const fallback = document.createElement("div");
+    fallback.className = "emoji";
+    fallback.textContent = product.emoji || "🎁";
+    card.insertBefore(fallback, name);
+   };
+
+  } else {
+   visual = document.createElement("div");
+   visual.className = "emoji";
+   visual.textContent = product.emoji || "🎁";
+  }
+
+  const name = document.createElement("h3");
+  name.textContent = product.name || "Без названия";
+
+  const price = document.createElement("div");
+  price.className = "price";
+  price.textContent = category==="reviews" ? "⭐ Отзыв" : "💰 " + (product.price || "Уточнить");
+
+  card.append(visual,name,price);
+
+  if (category==="help") {
+   const details = document.createElement("button");
+   details.className = "details";
+   details.textContent = "📖 Подробнее";
+   details.onclick = () => openDetails(product);
+   card.append(details);
+
+  } else if (category==="reviews") {
+   const review = document.createElement("div");
+   review.className = "modal-description";
+   review.textContent = product.description || "";
+   card.append(review);
+
+  } else {
+   const buy = document.createElement("button");
+   buy.className = "buy";
+   buy.textContent = "🛒 Купить";
+   buy.onclick = () => buyProduct(product);
+   card.append(buy);
+  }
+
+  if (isAdmin) {
+   const edit = document.createElement("button");
+   edit.className = "edit";
+   edit.textContent = "✏️ Изменить";
+   edit.onclick = () => startEdit(product);
+
+   const remove = document.createElement("button");
+   remove.className = "delete";
+   remove.textContent = "🗑 Удалить";
+   remove.onclick = () => deleteProduct(product);
+
+   card.append(edit,remove);
+  }
+
+  container.appendChild(card);
+ });
+}
+
+function openDetails(product) {
+ document.getElementById("modalTitle").textContent = product.name || "Услуга";
+
+ document.getElementById("modalPrice").textContent =
+  "💰 " + (product.price || "Уточнить");
+
+ document.getElementById("modalDescription").textContent =
+  product.description || "Подробности уточняйте у продавца.";
+
+ document.getElementById("modalOrderButton").onclick =
+  () => orderService(product);
+
+ document.getElementById("detailsModal").classList.remove("hidden");
+}
+
+function closeDetails() {
+ document.getElementById("detailsModal").classList.add("hidden");
+}
+
+function orderService(product) {
+ const message =
+  "Здравствуйте! Хочу заказать услугу: " +
+  product.name +
+  ". Цена: " +
+  (product.price || "уточнить") +
+  ".";
+
+ const url =
+  "https://t.me/Legendjhnb?text=" + encodeURIComponent(message);
+
+ if (tg) {
+  tg.openTelegramLink(url);
+ } else {
+  window.open(url, "_blank");
+ }
+}
 
 function buyProduct(product) {
-    const orderData = {
-        n: String(product.name),
-        p: String(product.price)
-    };
+ const orderData = {
+  n:String(product.name),
+  p:String(product.price)
+ };
 
-    // Кодируем информацию о товаре
-    const bytes = new TextEncoder().encode(
-        JSON.stringify(orderData)
-    );
+ const bytes = new TextEncoder().encode(JSON.stringify(orderData));
+ let binary = "";
 
-    let binary = "";
-    bytes.forEach(byte => {
-        binary += String.fromCharCode(byte);
-    });
+ bytes.forEach(byte => binary += String.fromCharCode(byte));
 
-    const payload = btoa(binary)
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
+ const payload = btoa(binary)
+  .replace(/\+/g,"-")
+  .replace(/\//g,"_")
+  .replace(/=+$/,"");
 
-    if (payload.length > 60) {
-        alert("Название или цена товара слишком длинные!");
-        return;
-    }
+ if (payload.length > 60) {
+  alert("Название или цена товара слишком длинные!");
+  return;
+ }
 
-    const url =
-    "https://t.me/BloxShopLegend_bot?start=order_" + payload;
+ const url = "https://t.me/BloxShopLegend_bot?start=order_" + payload;
 
-    if (tg) {
-        tg.openTelegramLink(url);
-    } else {
-        window.open(url, "_blank");
-    }
+ if (tg) {
+  tg.openTelegramLink(url);
+ } else {
+  window.open(url, "_blank");
+ }
 }
 
-
-// Добавление или изменение товара
 async function saveProduct() {
-    if (!isAdmin) {
-        alert("Нет доступа!");
-        return;
-    }
+ if (!isAdmin) {
+  alert("Нет доступа!");
+  return;
+ }
 
-    if (!tg?.initData) {
-        alert("Открой магазин через Telegram!");
-        return;
-    }
+ if (!tg?.initData) {
+  alert("Открой магазин через Telegram!");
+  return;
+ }
 
-    const name = document.getElementById("productName").value.trim();
-    const price = document.getElementById("productPrice").value.trim();
-    const emoji = document.getElementById("productEmoji").value.trim();
-    const imageFileId = document.getElementById("productImageFileId").value.trim();
-    const category = document.getElementById("productCategory").value;
+ const name = document.getElementById("productName").value.trim();
+ let price = document.getElementById("productPrice").value.trim();
+ const emoji = document.getElementById("productEmoji").value.trim();
+ const imageFileId = document.getElementById("productImageFileId").value.trim();
+ const description = document.getElementById("productDescription").value.trim();
+ const category = document.getElementById("productCategory").value;
 
-    if (!name || !price) {
-        alert("Заполни название и цену!");
-        return;
-    }
+ if (!name) {
+  alert("Укажи название!");
+  return;
+ }
 
-    const productData = {
-        name,
-        price,
-        emoji: emoji || "🎁",
-        category
-    };
+ if (category!=="reviews" && !price) {
+  alert("Укажи цену!");
+  return;
+ }
 
-    // Если file_id не введён при редактировании, старая фотография сохраняется.
-    if (imageFileId) {
-        productData.image_file_id = imageFileId;
-    }
+ if (category==="reviews" && !price) {
+  price = "Отзыв";
+ }
 
-    const body = JSON.stringify(productData);
+ const data = {
+  name,
+  price,
+  emoji:emoji || "🎁",
+  category,
+  description
+ };
 
-    const url = editingProductId
-        ? API_URL + "/api/products/" + editingProductId
-        : API_URL + "/api/products";
+ if (imageFileId) {
+  data.image_file_id = imageFileId;
+ }
 
-    const method = editingProductId ? "PUT" : "POST";
+ const url = editingProductId
+  ? API_URL + "/api/products/" + editingProductId
+  : API_URL + "/api/products";
 
-    try {
-        const response = await fetch(url, {
-            method,
-            headers: authHeaders(),
-            body
-        });
+ const method = editingProductId ? "PUT" : "POST";
+ const button = document.getElementById("saveButton");
 
-        const result = await response.json();
+ button.disabled = true;
+ button.textContent = "⏳ Сохраняем...";
 
-        if (!response.ok || !result.success) {
-            throw new Error(result.error || "Не удалось сохранить товар");
-        }
+ try {
+  const response = await fetch(url,{
+   method,
+   headers:authHeaders(),
+   body:JSON.stringify(data)
+  });
 
-        alert(editingProductId
-            ? "✅ Товар изменён!"
-            : "✅ Товар добавлен!");
+  const result = await response.json();
 
-        cancelEdit();
-        await loadProducts();
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Не удалось сохранить");
+  }
 
-    } catch (error) {
-        console.error(error);
-        alert("❌ " + error.message);
-    }
+  alert(editingProductId ? "✅ Изменения сохранены!" : "✅ Добавлено!");
+
+  cancelEdit();
+  await loadProducts();
+
+ } catch(error) {
+  console.error(error);
+  alert("❌ " + error.message);
+
+ } finally {
+  button.disabled = false;
+  button.textContent = editingProductId ? "💾 Сохранить" : "➕ Добавить";
+ }
 }
 
-// Начать редактирование
 function startEdit(product) {
-    editingProductId = product.id;
+ if (!isAdmin) return;
 
-    document.getElementById("productName").value = product.name;
-    document.getElementById("productPrice").value = product.price;
-    document.getElementById("productEmoji").value = product.emoji || "";
-    document.getElementById("productImageFileId").value = "";
-    document.getElementById("productCategory").value = product.category;
+ editingProductId = product.id;
 
-    document.getElementById("saveButton").textContent = "💾 Сохранить";
-    document.getElementById("cancelButton").classList.remove("hidden");
+ document.getElementById("productName").value = product.name || "";
+ document.getElementById("productPrice").value = product.price || "";
+ document.getElementById("productEmoji").value = product.emoji || "";
+ document.getElementById("productImageFileId").value = "";
+ document.getElementById("productDescription").value = product.description || "";
+ document.getElementById("productCategory").value = product.category || "blox";
 
-    document.getElementById("adminPanel")
-        .scrollIntoView({ behavior: "smooth" });
+ document.getElementById("saveButton").textContent = "💾 Сохранить";
+ document.getElementById("cancelButton").classList.remove("hidden");
+
+ const panel = document.getElementById("adminPanel");
+
+ if (panel.classList.contains("hidden")) {
+  toggleAdminPanel();
+ }
+
+ panel.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
-// Отмена редактирования
 function cancelEdit() {
-    editingProductId = null;
+ editingProductId = null;
 
-    document.getElementById("productName").value = "";
-    document.getElementById("productPrice").value = "";
-    document.getElementById("productEmoji").value = "";
-    document.getElementById("productImageFileId").value = "";
+ [
+  "productName",
+  "productPrice",
+  "productEmoji",
+  "productImageFileId",
+  "productDescription"
+ ].forEach(id => {
+  document.getElementById(id).value = "";
+ });
 
-    document.getElementById("saveButton").textContent =
-        "➕ Добавить товар";
-
-    document.getElementById("cancelButton")
-        .classList.add("hidden");
+ document.getElementById("productCategory").value = "blox";
+ document.getElementById("saveButton").textContent = "➕ Добавить";
+ document.getElementById("cancelButton").classList.add("hidden");
 }
 
-// Удаление товара
 async function deleteProduct(product) {
-    if (!isAdmin) return;
+ if (!isAdmin) return;
 
-    if (!confirm("Удалить товар «" + product.name + "»?")) {
-        return;
-    }
+ if (!tg?.initData) {
+  alert("Открой магазин через Telegram!");
+  return;
+ }
 
-    try {
-        const response = await fetch(
-            API_URL + "/api/products/" + product.id,
-            {
-                method: "DELETE",
-                headers: authHeaders()
-            }
-        );
+ if (!confirm("Удалить «" + product.name + "»?")) return;
 
-        const result = await response.json();
+ try {
+  const response = await fetch(
+   API_URL + "/api/products/" + product.id,
+   {
+    method:"DELETE",
+    headers:authHeaders()
+   }
+  );
 
-        if (!response.ok || !result.success) {
-            throw new Error(result.error || "Ошибка удаления");
-        }
+  const result = await response.json();
 
-        alert("🗑 Товар удалён!");
-        await loadProducts();
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Ошибка удаления");
+  }
 
-    } catch (error) {
-        alert("❌ " + error.message);
-    }
+  alert("🗑 Удалено!");
+  await loadProducts();
+
+ } catch(error) {
+  console.error(error);
+  alert("❌ " + error.message);
+ }
+}
+
+function clearSearch() {
+ document.getElementById("searchInput").value = "";
+ showProducts(currentCategory);
 }
 
 loadProducts();
-function clearSearch() {
-    document.getElementById("searchInput").value = "";
-    showProducts(currentCategory);
-}
 </script>
-
 </body>
 </html>
