@@ -30,6 +30,11 @@ UKRAINE_TZ = ZoneInfo("Europe/Kyiv")
 ALLOWED_CATEGORIES = (
     "blox",
     "brainrot",
+    "brainrot_ordinary",
+    "brainrot_mutations",
+    "brainrot_divine",
+    "brainrot_lucky",
+    "brainrot_rare",
     "help",
     "reviews",
     "accounts"
