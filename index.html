@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10101c">
+<title>Legend Market</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:15px;
+ background:radial-gradient(ellipse at top,#29205a 0%,transparent 50%),#090912;
+ color:white;font-family:Arial,sans-serif
+}
+button{cursor:pointer;border:0;color:white;font-weight:bold;transition:.2s}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.hidden{display:none!important}
+
+.header{
+ text-align:center;padding:27px 14px;
+ background:linear-gradient(135deg,#713cff,#24104d,#11152e);
+ border:1px solid #7955ff;border-radius:22px;margin-bottom:20px;
+ box-shadow:0 8px 35px #713cff35
+}
+.header h1{margin:5px;font-size:32px;letter-spacing:2px;text-shadow:0 0 15px #b89aff}
+.header p{color:#ded5ff;margin:8px 0}
+
+.tabs,.help-subtabs{display:flex;gap:8px;margin-bottom:13px;flex-wrap:wrap}
+.tab,.help-subtabs button{
+ flex:1;min-width:28%;padding:12px 5px;background:#1c1b30;
+ border:1px solid #393454;border-radius:12px;font-size:13px
+}
+.tab.active,.help-subtabs button.active{
+ background:linear-gradient(135deg,#8955ff,#5425cf);
+ border-color:#a78aff;box-shadow:0 0 18px #713cff55
+}
+.admin-toggle{
+ width:100%;padding:13px;margin:0 0 17px;border-radius:12px;
+ border:1px solid #a17aff;background:linear-gradient(135deg,#39305e,#211a3b)
+}
+.admin-toggle.active{background:linear-gradient(135deg,#8955ff,#5425cf)}
+
+.search-box{margin-bottom:15px}
+.search-box input{
+ width:100%;padding:15px;border-radius:13px;border:1px solid #7955ff;
+ background:#171529;color:white;font-size:16px;outline:none
+}
+.search-box input::placeholder{color:#aaa}
+.clear-search{width:100%;margin-top:8px;padding:10px;background:#292344;border-radius:10px}
+
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.product{
+ min-width:0;padding:12px 10px;text-align:center;
+ background:linear-gradient(160deg,#25243d,#151522);
+ border:1px solid #40375f;border-radius:19px;box-shadow:0 5px 20px #0005
+}
+.emoji{font-size:52px;margin:12px;filter:drop-shadow(0 0 10px #8955ff)}
+.product-image{
+ width:100%;height:150px;object-fit:contain;border-radius:13px;
+ margin:4px 0 10px;background:#11111e
+}
+.product h3{font-size:16px;overflow-wrap:anywhere;min-height:36px}
+.price{color:#c3a4ff;font-size:16px;font-weight:bold;margin:13px 0}
+.buy,.admin-button,.details{
+ width:100%;padding:13px 8px;
+ background:linear-gradient(135deg,#914fff,#5425d5);
+ border:1px solid #a17aff;border-radius:12px;
+ box-shadow:0 4px 15px #713cff40
+}
+.details{margin-bottom:8px;background:linear-gradient(135deg,#494078,#30234e)}
+.status{text-align:center;color:#aaa;padding:30px 10px;grid-column:1/-1}
+
+.admin{
+ margin:22px 0;padding:17px;
+ background:linear-gradient(145deg,#24213d,#151522);
+ border:1px solid #8955ff;border-radius:19px
+}
+.admin h2{text-align:center;color:#c9adff;margin-top:4px}
+.admin h3{color:#d7c5ff;margin-top:25px}
+.admin-description{text-align:center;color:#aaa;font-size:14px}
+.admin input,.admin select,.admin textarea{
+ display:block;width:100%;padding:13px;margin:10px 0;
+ border-radius:11px;border:1px solid #494064;
+ background:#11111e;color:white;outline:none;font:inherit
+}
+.admin textarea{min-height:90px;resize:vertical}
+.admin-actions{display:flex;gap:8px}
+.admin-actions button{flex:1}
+.secondary{background:#45455c!important}
+.edit,.delete{width:100%;padding:10px;margin-top:8px;border-radius:9px}
+.edit{background:#4545a0}.delete{background:#a83248}
+
+.contact-box{
+ margin-top:18px;padding:16px;text-align:center;
+ background:#1b1830;border:1px solid #494064;border-radius:15px;color:#ddd
+}
+.contact-box a{color:#c3a4ff;text-decoration:none;font-weight:bold}
+
+.modal{
+ position:fixed;inset:0;background:#000b;display:flex;
+ align-items:center;justify-content:center;padding:16px;z-index:10
+}
+.modal-card{
+ width:100%;max-width:440px;max-height:85vh;overflow:auto;
+ background:linear-gradient(160deg,#292544,#12121f);
+ border:1px solid #8955ff;border-radius:20px;padding:19px
+}
+.modal-card h2{text-align:center;color:#d7c5ff}
+.modal-description{white-space:pre-wrap;line-height:1.5;color:#eee}
+.modal-actions{display:flex;gap:9px;margin-top:18px}
+.modal-actions button{flex:1}
+.close{background:#45455c;border-radius:11px;padding:13px}
+
+.quantity-box{
+ display:flex;align-items:center;justify-content:center;gap:15px;
+ margin:14px 0;padding:10px;background:#171529;
+ border:1px solid #494064;border-radius:13px
+}
+.quantity-box button{
+ width:38px;height:38px;border-radius:10px;
+ background:linear-gradient(135deg,#8955ff,#5425cf);font-size:22px
+}
+.quantity-number{font-size:19px;font-weight:bold;min-width:28px;text-align:center}
+.quantity-label{font-size:13px;color:#aaa;margin-top:12px}
+.purchase-info{color:#bbb;font-size:13px;text-align:center;margin-top:8px}
+
+.promo-box{
+ margin-top:16px;padding:14px;background:#171529;
+ border:1px solid #494064;border-radius:13px
+}
+.promo-box label{display:block;color:#d7c5ff;margin-bottom:8px;font-weight:bold}
+.promo-row{display:flex;gap:7px}
+.promo-row input{
+ min-width:0;flex:1;padding:12px;border-radius:10px;
+ border:1px solid #7955ff;background:#11111e;color:white;font-size:15px
+}
+.promo-row button{padding:10px 13px;border-radius:10px;background:#6735d1}
+.promo-message{font-size:13px;margin-top:10px;min-height:17px;color:#aaa}
+.promo-success{color:#72e6a1}.promo-error{color:#ff8585}
+.discount-total{
+ margin-top:13px;padding:12px;border-radius:10px;
+ background:#211b38;text-align:center;line-height:1.7
+}
+.old-price{text-decoration:line-through;color:#999}
+.new-price{font-size:21px;color:#83efa9;font-weight:bold}
+.promo-item{
+ padding:13px;margin-top:10px;background:#171529;
+ border:1px solid #494064;border-radius:12px;overflow-wrap:anywhere
+}
+.promo-item strong{color:#d7c5ff;font-size:17px}
+.promo-item small{display:block;color:#aaa;margin-top:6px;line-height:1.5}
+.promo-active{color:#72e6a1}.promo-inactive{color:#ff8585}
+
+footer{text-align:center;color:#777;margin-top:30px;padding:15px;font-size:12px}
+
+@media(max-width:380px){
+ body{padding:10px}
+ .tabs,.help-subtabs{gap:5px}
+ .tab,.help-subtabs button{font-size:11px;padding:11px 3px}
+ .products{gap:8px}
+ .product{padding:9px 6px}
+ .product-image{height:120px}
+ .header h1{font-size:27px}
+ .promo-row{flex-direction:column}
+ .promo-row button{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+ <h1>🔥 LEGEND MARKET</h1>
+ <p>Магазин игровых товаров и услуг</p>
+ <p>🛒 Выбирай товары и оформляй заказы!</p>
+</div>
+
+<div class="tabs">
+ <button class="tab active" id="bloxTab" onclick="showProducts('blox')">🍎 Blox Fruits</button>
+ <button class="tab" id="brainrotTab" onclick="showProducts('brainrot')">🧠 Brainrot</button>
+ <button class="tab" id="accountsTab" onclick="showProducts('accounts')">👤 Аккаунты</button>
+ <button class="tab" id="helpTab" onclick="showProducts('help')">🛠 Услуги</button>
+</div>
+
+<button class="admin-toggle hidden" id="adminToggle" onclick="toggleAdminPanel()">⚙️ Открыть админку</button>
+
+<div class="search-box">
+ <input id="searchInput" placeholder="🔎 Найти товар или услугу..." oninput="showProducts(currentCategory)">
+ <button class="clear-search" onclick="clearSearch()">❌ Очистить поиск</button>
+</div>
+
+<div id="helpSubtabs" class="help-subtabs hidden">
+ <button id="servicesTab" class="active" onclick="showHelpSection('help')">🛠 Услуги</button>
+ <button id="reviewsTab" onclick="showHelpSection('reviews')">⭐ Отзывы</button>
+</div>
+
+<div id="brainrotSubtabs" class="help-subtabs hidden">
+ <button id="brainrotOrdinaryTab" class="active" onclick="showBrainrotSection('ordinary')">🧠 Обычные</button>
+ <button id="brainrotMutationsTab" onclick="showBrainrotSection('mutations')">🌈 Мутации</button>
+ <button id="brainrotDivineTab" onclick="showBrainrotSection('divine')">👑 Divine</button>
+ <button id="brainrotLuckyTab" onclick="showBrainrotSection('lucky')">🍀 Lucky</button>
+ <button id="brainrotRareTab" onclick="showBrainrotSection('rare')">💎 Редкие</button>
+</div>
+
+<div class="products" id="products">
+ <div class="status">⏳ Загружаем товары...</div>
+</div>
+
+<div class="contact-box hidden" id="helpContacts">
+ <b>💯 Честно · ⚡ Быстро · 🤝 Без обмана</b><br><br>
+ По вопросам заказов и услуг:<br>
+ <a href="https://t.me/Legendjhnb" onclick="openContact(event,'Legendjhnb')">@Legendjhnb</a>
+</div>
+
+<div class="admin hidden" id="adminPanel">
+ <h2>⚙️ Панель администратора</h2>
+ <p class="admin-description">Управление товарами, аккаунтами, услугами и промокодами</p>
+
+ <h3>📦 Товары и услуги</h3>
+ <input id="productName" placeholder="Название" maxlength="100">
+ <input id="productPrice" placeholder="Цена (например: 25 Robux)" maxlength="100">
+ <input id="productEmoji" placeholder="Эмодзи, например 🍎" maxlength="20">
+ <input id="productImageFileId" placeholder="Telegram file_id фотографии (необязательно)">
+ <textarea id="productDescription" placeholder="Описание товара или услуги"></textarea>
+
+ <select id="productCategory">
+  <option value="blox">Blox Fruits</option>
+  <option value="brainrot_ordinary">🧠 Brainrot — обычные</option>
+  <option value="brainrot_mutations">🌈 Brainrot — мутации</option>
+  <option value="brainrot_divine">👑 Brainrot — Divine</option>
+  <option value="brainrot_lucky">🍀 Brainrot — Lucky</option>
+  <option value="brainrot_rare">💎 Brainrot — редкие</option>
+  <option value="accounts">Продажа аккаунтов</option>
+  <option value="help">Услуги</option>
+  <option value="reviews">Отзывы</option>
+ </select>
+
+ <div class="admin-actions">
+  <button class="admin-button" id="saveButton" onclick="saveProduct()">➕ Добавить</button>
+  <button class="admin-button secondary hidden" id="cancelButton" onclick="cancelEdit()">Отмена</button>
+ </div>
+ <p id="adminMessage" class="admin-description"></p>
+
+ <hr style="border-color:#494064;margin:25px 0">
+
+ <h3>🎟️ Управление промокодами</h3>
+ <input id="promoCode" placeholder="Промокод (например: LEGEND10)" maxlength="32">
+ <input id="promoDiscount" type="number" min="1" max="100" placeholder="Скидка в процентах">
+ <input id="promoMaxUses" type="number" min="1" placeholder="Максимум использований (пусто = без лимита)">
+
+ <label style="display:block;color:#c9adff;margin-top:14px">Дата окончания (необязательно)</label>
+ <input id="promoExpires" type="datetime-local">
+
+ <label style="display:flex;align-items:center;gap:9px;color:#ddd;margin:12px 0">
+  <input id="promoActive" type="checkbox" checked style="width:auto;margin:0">
+  Промокод активен
+ </label>
+
+ <div class="admin-actions">
+  <button class="admin-button" id="savePromoButton" onclick="savePromo()">🎟️ Создать промокод</button>
+  <button class="admin-button secondary hidden" id="cancelPromoButton" onclick="cancelPromoEdit()">Отмена</button>
+ </div>
+
+ <p id="promoAdminMessage" class="admin-description"></p>
+ <div id="promoList"><div class="status">Промокоды ещё не загружены</div></div>
+</div>
+
+<div id="detailsModal" class="modal hidden" onclick="if(event.target===this)closeDetails()">
+ <div class="modal-card">
+  <h2 id="modalTitle"></h2>
+  <div class="price" id="modalPrice"></div>
+  <div class="modal-description" id="modalDescription"></div>
+  <div class="modal-actions">
+   <button class="buy" id="modalOrderButton">📩 Заказать</button>
+   <button class="close" onclick="closeDetails()">Закрыть</button>
+  </div>
+ </div>
+</div>
+
+<div id="purchaseModal" class="modal hidden" onclick="if(event.target===this)closePurchase()">
+ <div class="modal-card">
+  <h2 id="purchaseTitle">🛒 Покупка</h2>
+  <div class="price" id="purchaseOriginalPrice"></div>
+
+  <div id="quantitySection">
+   <div class="quantity-label">Количество товара</div>
+   <div class="quantity-box">
+    <button type="button" onclick="changeQuantity(-1)">−</button>
+    <span class="quantity-number" id="quantityValue">1</span>
+    <button type="button" onclick="changeQuantity(1)">+</button>
+   </div>
+  </div>
+
+  <div class="purchase-info" id="purchaseInfo"></div>
+
+  <div class="promo-box">
+   <label for="purchasePromoCode">🎟️ Есть промокод?</label>
+   <div class="promo-row">
+    <input id="purchasePromoCode" placeholder="Введи промокод" maxlength="32">
+    <button id="applyPromoButton" onclick="applyPromo()">Применить</button>
+   </div>
+   <div class="promo-message" id="promoMessage"></div>
+  </div>
+
+  <div class="discount-total" id="purchaseTotal"></div>
+
+  <div class="modal-actions">
+   <button class="buy" id="confirmPurchaseButton" onclick="confirmPurchase()">📩 Заказать</button>
+   <button class="close" onclick="closePurchase()">Закрыть</button>
+  </div>
+ </div>
+</div>
+
+<footer>Legend Market © 2026</footer>
+
+<script>
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+ tg.ready();
+ tg.expand();
+ tg.setHeaderColor("#10101c");
+ tg.setBackgroundColor("#10101c");
+}
+
+const API_URL = "https://bloxshop-backend.onrender.com";
+const ADMIN_ID = 7580041056;
+const BOT_USERNAME = "LegendMarketShopBot";
+const MAX_QUANTITY = 99;
+
+let allProducts = [];
+let currentCategory = "blox";
+let currentHelpSection = "help";
+let currentBrainrotSection = "ordinary";
+let editingProductId = null;
+
+let currentPurchaseProduct = null;
+let appliedPromo = null;
+let currentQuantity = 1;
+let editingPromoId = null;
+let allPromos = [];
+
+const isAdmin = Number(tg?.initDataUnsafe?.user?.id) === ADMIN_ID;
+
+if (isAdmin) {
+ document.getElementById("adminToggle").classList.remove("hidden");
+}
+
+function openContact(event, username) {
+ event.preventDefault();
+ const url = "https://t.me/" + username;
+ if (tg) tg.openTelegramLink(url);
+ else window.open(url, "_blank");
+}
+
+function authHeaders() {
+ return {
+  "Content-Type":"application/json",
+  "X-Telegram-Init-Data":tg?.initData || ""
+ };
+}
+
+function escapeHTML(value) {
+ return String(value ?? "").replace(/[&<>"']/g, char => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+ }[char]));
+}
+
+function toggleAdminPanel() {
+ if (!isAdmin) return;
+
+ const panel = document.getElementById("adminPanel");
+ const toggle = document.getElementById("adminToggle");
+ const opening = panel.classList.contains("hidden");
+
+ panel.classList.toggle("hidden",!opening);
+ toggle.classList.toggle("active",opening);
+ toggle.textContent = opening ? "✖️ Закрыть админку" : "⚙️ Открыть админку";
+
+ if (opening) {
+  panel.scrollIntoView({behavior:"smooth",block:"start"});
+  loadPromos();
+ } else {
+  cancelEdit();
+  cancelPromoEdit();
+ }
+}
+
+async function loadProducts() {
+ const container = document.getElementById("products");
+ container.innerHTML = '<div class="status">⏳ Загружаем товары...</div>';
+
+ try {
+  const response = await fetch(API_URL + "/api/products");
+  if (!response.ok) throw new Error("Ошибка сервера: " + response.status);
+
+  const data = await response.json();
+  allProducts = Array.isArray(data) ? data : (data.products || []);
+  showProducts(currentCategory);
+
+ } catch(error) {
+  console.error(error);
+  container.innerHTML =
+   '<div class="status">❌ Ошибка загрузки.<br><br><button class="buy" onclick="loadProducts()">🔄 Повторить</button></div>';
+ }
+}
+
+function showProducts(category) {
+ currentCategory = category;
+
+ document.getElementById("bloxTab").classList.toggle("active",category==="blox");
+ document.getElementById("brainrotTab").classList.toggle("active",category==="brainrot");
+ document.getElementById("accountsTab").classList.toggle("active",category==="accounts");
+ document.getElementById("helpTab").classList.toggle("active",category==="help");
+
+ document.getElementById("products").classList.remove("hidden");
+ document.getElementById("helpSubtabs").classList.toggle("hidden",category!=="help");
+ document.getElementById("brainrotSubtabs").classList.toggle("hidden",category!=="brainrot");
+ document.getElementById("helpContacts").classList.toggle("hidden",category!=="help");
+
+ if (category==="brainrot") {
+  showBrainrotSection(currentBrainrotSection);
+  return;
+ }
+
+ if (category==="help") {
+  showHelpSection(currentHelpSection);
+  return;
+ }
+
+ renderCategory(category);
+}
+
+function showBrainrotSection(section) {
+ currentBrainrotSection = section;
+
+ const tabs = {
+  ordinary:"brainrotOrdinaryTab",
+  mutations:"brainrotMutationsTab",
+  divine:"brainrotDivineTab",
+  lucky:"brainrotLuckyTab",
+  rare:"brainrotRareTab"
+ };
+
+ Object.entries(tabs).forEach(([key,id]) => {
+  document.getElementById(id).classList.toggle("active",key===section);
+ });
+
+ renderCategory("brainrot_" + section);
+}
+
+function showHelpSection(section) {
+ currentHelpSection = section;
+ document.getElementById("servicesTab").classList.toggle("active",section==="help");
+ document.getElementById("reviewsTab").classList.toggle("active",section==="reviews");
+ renderCategory(section);
+}
+
+function renderCategory(category) {
+ const container = document.getElementById("products");
+ container.innerHTML = "";
+
+ const searchText = document.getElementById("searchInput").value.trim().toLowerCase();
+
+ const filtered = allProducts.filter(p => {
+  const productCategory = p.category === "brainrot" ? "brainrot_ordinary" : p.category;
+
+  return productCategory === category && (
+   String(p.name || "").toLowerCase().includes(searchText) ||
+   String(p.description || "").toLowerCase().includes(searchText)
+  );
+ });
+
+ if (!filtered.length) {
+  container.innerHTML =
+   '<div class="status">' +
+   (searchText ? '🔎 Ничего не найдено.' : '📦 Здесь пока пусто.') +
+   '</div>';
+  return;
+ }
+
+ filtered.forEach(product => {
+  const card = document.createElement("div");
+  card.className = "product";
+
+  let visual;
+
+  if (product.image_url) {
+   visual = document.createElement("img");
+   visual.className = "product-image";
+
+   visual.src = product.image_url.startsWith("http")
+    ? product.image_url
+    : API_URL + product.image_url;
+
+   visual.alt = product.name || "Фото";
+   visual.loading = "lazy";
+
+   visual.onerror = () => {
+    visual.remove();
+    const fallback = document.createElement("div");
+    fallback.className = "emoji";
+    fallback.textContent = product.emoji || "🎁";
+    card.insertBefore(fallback,name);
+   };
+  } else {
+   visual = document.createElement("div");
+   visual.className = "emoji";
+   visual.textContent = product.emoji || "🎁";
+  }
+
+  const name = document.createElement("h3");
+  name.textContent = product.name || "Без названия";
+
+  const price = document.createElement("div");
+  price.className = "price";
+  price.textContent = category==="reviews"
+   ? "⭐ Отзыв"
+   : "💰 " + (product.price || "Уточнить");
+
+  card.append(visual,name,price);
+
+  if (category==="help") {
+   const details = document.createElement("button");
+   details.className = "details";
+   details.textContent = "📖 Подробнее";
+   details.onclick = () => openDetails(product);
+   card.append(details);
+
+  } else if (category==="reviews") {
+   const review = document.createElement("div");
+   review.className = "modal-description";
+   review.textContent = product.description || "";
+   card.append(review);
+
+  } else {
+   const buy = document.createElement("button");
+   buy.className = "buy";
+   buy.textContent = category==="accounts" ? "👤 Купить аккаунт" : "🛒 Купить";
+   buy.onclick = () => openPurchase(product);
+   card.append(buy);
+  }
+
+  if (isAdmin) {
+   const edit = document.createElement("button");
+   edit.className = "edit";
+   edit.textContent = "✏️ Изменить";
+   edit.onclick = () => startEdit(product);
+
+   const remove = document.createElement("button");
+   remove.className = "delete";
+   remove.textContent = "🗑 Удалить";
+   remove.onclick = () => deleteProduct(product);
+
+   card.append(edit,remove);
+  }
+
+  container.appendChild(card);
+ });
+}
+
+function openDetails(product) {
+ document.getElementById("modalTitle").textContent = product.name || "Услуга";
+ document.getElementById("modalPrice").textContent = "💰 " + (product.price || "Уточнить");
+ document.getElementById("modalDescription").textContent =
+  product.description || "Подробности уточняйте у продавца.";
+
+ document.getElementById("modalOrderButton").onclick = () => orderService(product);
+ document.getElementById("detailsModal").classList.remove("hidden");
+}
+
+function closeDetails() {
+ document.getElementById("detailsModal").classList.add("hidden");
+}
+
+function orderService(product) {
+ const message =
+  "Здравствуйте! Хочу заказать услугу: " +
+  product.name +
+  ". Цена: " +
+  (product.price || "уточнить") +
+  ".";
+
+ const url = "https://t.me/Legendjhnb?text=" + encodeURIComponent(message);
+
+ if (tg) tg.openTelegramLink(url);
+ else window.open(url,"_blank");
+}
+
+
+// -------------------------
+// PURCHASE
+// -------------------------
+
+function isAccount(product) {
+ return product?.category === "accounts";
+}
+
+function changeQuantity(change) {
+ if (!currentPurchaseProduct || isAccount(currentPurchaseProduct)) return;
+
+ currentQuantity = Math.max(1,Math.min(MAX_QUANTITY,currentQuantity+change));
+ appliedPromo = null;
+
+ document.getElementById("quantityValue").textContent = currentQuantity;
+ document.getElementById("promoMessage").textContent = "";
+ document.getElementById("promoMessage").className = "promo-message";
+
+ renderPurchaseTotal();
+}
+
+function getPriceParts(price) {
+ const match = String(price || "").trim().match(/^(\d+(?:[.,]\d+)?)(.*)$/);
+ if (!match) return null;
+
+ return {
+  amount:Number(match[1].replace(",", ".")),
+  suffix:match[2].trim()
+ };
+}
+
+function formatMoney(value) {
+ return Number(value.toFixed(2)).toString();
+}
+
+function calculateTotal(price,quantity) {
+ const parts = getPriceParts(price);
+ if (!parts || !Number.isFinite(parts.amount)) return null;
+
+ const total = parts.amount * quantity;
+ return formatMoney(total) + (parts.suffix ? " " + parts.suffix : "");
+}
+
+function openPurchase(product) {
+ currentPurchaseProduct = product;
+ appliedPromo = null;
+ currentQuantity = 1;
+
+ const account = isAccount(product);
+
+ document.getElementById("purchaseTitle").textContent =
+  (account ? "👤 Аккаунт: " : "🛒 ") + product.name;
+
+ document.getElementById("purchaseOriginalPrice").textContent =
+  "Цена за 1 шт.: " + (product.price || "Уточнить");
+
+ document.getElementById("quantitySection").classList.toggle("hidden",account);
+ document.getElementById("quantityValue").textContent = "1";
+
+ document.getElementById("purchaseInfo").textContent =
+  account ? "Аккаунты продаются по одной штуке." :
+  "Можно заказать от 1 до " + MAX_QUANTITY + " штук.";
+
+ document.getElementById("purchasePromoCode").value = "";
+ document.getElementById("promoMessage").textContent = "";
+ document.getElementById("promoMessage").className = "promo-message";
+
+ renderPurchaseTotal();
+ document.getElementById("purchaseModal").classList.remove("hidden");
+}
+
+function closePurchase() {
+ document.getElementById("purchaseModal").classList.add("hidden");
+ currentPurchaseProduct = null;
+ appliedPromo = null;
+ currentQuantity = 1;
+}
+
+function renderPurchaseTotal() {
+ const total = document.getElementById("purchaseTotal");
+ if (!currentPurchaseProduct) return;
+
+ const quantity = isAccount(currentPurchaseProduct) ? 1 : currentQuantity;
+ const originalTotal = calculateTotal(currentPurchaseProduct.price,quantity);
+
+ if (appliedPromo) {
+  const oldTotal = appliedPromo.original_total || originalTotal || currentPurchaseProduct.price;
+  const newTotal = appliedPromo.discounted_total || "Уточнить";
+
+  total.innerHTML =
+   '<div>Количество: <b>' + quantity + '</b></div>' +
+   '<div>Промокод: <b>' + escapeHTML(appliedPromo.code) + '</b></div>' +
+   '<div>Скидка: <b>-' + Number(appliedPromo.discount_percent) + '%</b></div>' +
+   '<div class="old-price">Было: ' + escapeHTML(oldTotal) + '</div>' +
+   '<div class="new-price">Итого: ' + escapeHTML(newTotal) + '</div>';
+ } else {
+  total.textContent = "Итого за " + quantity + " шт.: " +
+   (originalTotal || currentPurchaseProduct.price || "Уточнить");
+ }
+}
+
+async function applyPromo() {
+ if (!currentPurchaseProduct) return;
+
+ const code = document.getElementById("purchasePromoCode").value.trim().toUpperCase();
+ const message = document.getElementById("promoMessage");
+ const button = document.getElementById("applyPromoButton");
+
+ if (!code) {
+  message.textContent = "Введи промокод!";
+  message.className = "promo-message promo-error";
+  return;
+ }
+
+ button.disabled = true;
+ button.textContent = "⏳ Проверка...";
+
+ try {
+  const quantity = isAccount(currentPurchaseProduct) ? 1 : currentQuantity;
+
+  const response = await fetch(API_URL + "/api/promocodes/validate",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    code,
+    product_id:currentPurchaseProduct.id,
+    quantity
+   })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Промокод не подходит");
+  }
+
+  appliedPromo = result;
+  appliedPromo.code = code;
+  renderPurchaseTotal();
+
+  message.textContent = "✅ Промокод применён!";
+  message.className = "promo-message promo-success";
+
+ } catch(error) {
+  appliedPromo = null;
+  renderPurchaseTotal();
+
+  message.textContent = "❌ " + error.message;
+  message.className = "promo-message promo-error";
+
+ } finally {
+  button.disabled = false;
+  button.textContent = "Применить";
+ }
+}
+
+function confirmPurchase() {
+ if (!currentPurchaseProduct) return;
+
+ const productId = Number(currentPurchaseProduct.id);
+
+ if (!Number.isInteger(productId) || productId <= 0) {
+  alert("Не удалось определить товар. Попробуй ещё раз.");
+  return;
+ }
+
+ const quantity = isAccount(currentPurchaseProduct) ? 1 : currentQuantity;
+ const code = appliedPromo ? appliedPromo.code : "";
+
+ let startParameter = "order_" + productId + "_q" + quantity;
+
+ if (code) startParameter += "_p" + code;
+
+ if (startParameter.length > 64) {
+  alert("Слишком длинный промокод!");
+  return;
+ }
+
+ const url = "https://t.me/" + BOT_USERNAME + "?start=" + startParameter;
+
+ if (tg) tg.openTelegramLink(url);
+ else window.open(url,"_blank");
+}
+
+
+// -------------------------
+// PRODUCTS ADMIN
+// -------------------------
+
+async function saveProduct() {
+ if (!isAdmin || !tg?.initData) {
+  alert("Открой магазин через Telegram!");
+  return;
+ }
+
+ const name = document.getElementById("productName").value.trim();
+ let price = document.getElementById("productPrice").value.trim();
+ const emoji = document.getElementById("productEmoji").value.trim();
+ const imageFileId = document.getElementById("productImageFileId").value.trim();
+ const description = document.getElementById("productDescription").value.trim();
+ const category = document.getElementById("productCategory").value;
+
+ if (!name) return alert("Укажи название!");
+ if (category!=="reviews" && !price) return alert("Укажи цену!");
+ if (category==="reviews" && !price) price = "Отзыв";
+
+ const data = {
+  name,price,emoji:emoji || "🎁",category,description
+ };
+
+ if (imageFileId) data.image_file_id = imageFileId;
+
+ const editing = editingProductId !== null;
+ const url = editing
+  ? API_URL + "/api/products/" + editingProductId
+  : API_URL + "/api/products";
+
+ const button = document.getElementById("saveButton");
+ button.disabled = true;
+ button.textContent = "⏳ Сохраняем...";
+
+ try {
+  const response = await fetch(url,{
+   method:editing ? "PUT" : "POST",
+   headers:authHeaders(),
+   body:JSON.stringify(data)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Не удалось сохранить");
+  }
+
+  alert(editing ? "✅ Изменения сохранены!" : "✅ Товар добавлен!");
+  cancelEdit();
+  await loadProducts();
+
+ } catch(error) {
+  alert("❌ " + error.message);
+
+ } finally {
+  button.disabled = false;
+  button.textContent = editingProductId ? "💾 Сохранить" : "➕ Добавить";
+ }
+}
+
+function startEdit(product) {
+ if (!isAdmin) return;
+
+ editingProductId = product.id;
+
+ document.getElementById("productName").value = product.name || "";
+ document.getElementById("productPrice").value = product.price || "";
+ document.getElementById("productEmoji").value = product.emoji || "";
+ document.getElementById("productImageFileId").value = "";
+ document.getElementById("productDescription").value = product.description || "";
+ document.getElementById("productCategory").value =
+  product.category === "brainrot" ? "brainrot_ordinary" : (product.category || "blox");
+
+ document.getElementById("saveButton").textContent = "💾 Сохранить";
+ document.getElementById("cancelButton").classList.remove("hidden");
+
+ const panel = document.getElementById("adminPanel");
+ if (panel.classList.contains("hidden")) toggleAdminPanel();
+
+ panel.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function cancelEdit() {
+ editingProductId = null;
+
+ [
+  "productName","productPrice","productEmoji",
+  "productImageFileId","productDescription"
+ ].forEach(id => document.getElementById(id).value = "");
+
+ document.getElementById("productCategory").value = "blox";
+ document.getElementById("saveButton").textContent = "➕ Добавить";
+ document.getElementById("cancelButton").classList.add("hidden");
+}
+
+async function deleteProduct(product) {
+ if (!isAdmin || !tg?.initData) return;
+ if (!confirm("Удалить «" + product.name + "»?")) return;
+
+ try {
+  const response = await fetch(
+   API_URL + "/api/products/" + product.id,
+   {method:"DELETE",headers:authHeaders()}
+  );
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Ошибка удаления");
+  }
+
+  alert("🗑 Удалено!");
+  await loadProducts();
+
+ } catch(error) {
+  alert("❌ " + error.message);
+ }
+}
+
+
+// -------------------------
+// PROMO ADMIN
+// -------------------------
+
+async function loadPromos() {
+ const list = document.getElementById("promoList");
+ list.innerHTML = '<div class="status">⏳ Загружаем промокоды...</div>';
+
+ try {
+  const response = await fetch(API_URL + "/api/promocodes",{
+   headers:authHeaders()
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+   throw new Error(data.error || "Не удалось загрузить промокоды");
+  }
+
+  allPromos = Array.isArray(data) ? data : [];
+  renderPromos();
+
+ } catch(error) {
+  list.innerHTML = '<div class="status">❌ ' + escapeHTML(error.message) + '</div>';
+ }
+}
+
+function renderPromos() {
+ const list = document.getElementById("promoList");
+ list.innerHTML = "";
+
+ if (!allPromos.length) {
+  list.innerHTML = '<div class="status">🎟️ Промокодов пока нет</div>';
+  return;
+ }
+
+ allPromos.forEach(promo => {
+  const item = document.createElement("div");
+  item.className = "promo-item";
+
+  const status = promo.active
+   ? '<span class="promo-active">● Активен</span>'
+   : '<span class="promo-inactive">● Отключён</span>';
+
+  const expiry = promo.expires_at
+   ? new Date(promo.expires_at).toLocaleString("ru-RU")
+   : "Без срока окончания";
+
+  const limit = promo.max_uses === null
+   ? "Без лимита"
+   : (promo.used_count || 0) + " / " + promo.max_uses;
+
+  const info = document.createElement("div");
+
+  info.innerHTML =
+   '<strong>' + escapeHTML(promo.code) + '</strong>' +
+   '<small>Скидка: ' + Number(promo.discount_percent) + '%</small>' +
+   '<small>Использовано: ' + limit + '</small>' +
+   '<small>Окончание: ' + escapeHTML(expiry) + '</small>' +
+   '<small>' + status + '</small>';
+
+  const edit = document.createElement("button");
+  edit.className = "edit";
+  edit.textContent = "✏️ Изменить";
+  edit.onclick = () => startPromoEdit(promo);
+
+  const toggle = document.createElement("button");
+  toggle.className = "edit";
+  toggle.textContent = promo.active ? "⏸ Отключить" : "▶️ Включить";
+  toggle.onclick = () => togglePromo(promo);
+
+  const remove = document.createElement("button");
+  remove.className = "delete";
+  remove.textContent = "🗑 Удалить";
+  remove.onclick = () => deletePromo(promo);
+
+  item.append(info,edit,toggle,remove);
+  list.appendChild(item);
+ });
+}
+
+function getPromoFormData() {
+ const code = document.getElementById("promoCode").value.trim().toUpperCase();
+ const discount = Number(document.getElementById("promoDiscount").value);
+ const maxValue = document.getElementById("promoMaxUses").value.trim();
+ const expiryValue = document.getElementById("promoExpires").value;
+
+ if (!/^[A-Z0-9_-]{3,32}$/.test(code)) {
+  throw new Error("Код: от 3 до 32 символов, латиница, цифры, _ и -");
+ }
+
+ if (!Number.isInteger(discount) || discount < 1 || discount > 100) {
+  throw new Error("Скидка должна быть от 1 до 100%");
+ }
+
+ let maxUses = null;
+
+ if (maxValue) {
+  maxUses = Number(maxValue);
+  if (!Number.isInteger(maxUses) || maxUses < 1) {
+   throw new Error("Лимит должен быть целым числом больше 0");
+  }
+ }
+
+ let expiresAt = null;
+ if (expiryValue) expiresAt = new Date(expiryValue).toISOString();
+
+ return {
+  code,
+  discount_percent:discount,
+  max_uses:maxUses,
+  expires_at:expiresAt,
+  active:document.getElementById("promoActive").checked
+ };
+}
+
+async function savePromo() {
+ if (!isAdmin || !tg?.initData) {
+  alert("Открой магазин через Telegram!");
+  return;
+ }
+
+ const button = document.getElementById("savePromoButton");
+ const message = document.getElementById("promoAdminMessage");
+
+ let data;
+
+ try {
+  data = getPromoFormData();
+ } catch(error) {
+  message.textContent = "❌ " + error.message;
+  return;
+ }
+
+ const editing = editingPromoId !== null;
+
+ button.disabled = true;
+ button.textContent = "⏳ Сохраняем...";
+
+ try {
+  const url = editing
+   ? API_URL + "/api/promocodes/" + editingPromoId
+   : API_URL + "/api/promocodes";
+
+  const response = await fetch(url,{
+   method:editing ? "PUT" : "POST",
+   headers:authHeaders(),
+   body:JSON.stringify(data)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Ошибка сохранения");
+  }
+
+  message.textContent = editing ? "✅ Промокод обновлён!" : "✅ Промокод создан!";
+  cancelPromoEdit();
+  await loadPromos();
+
+ } catch(error) {
+  message.textContent = "❌ " + error.message;
+
+ } finally {
+  button.disabled = false;
+  button.textContent = editingPromoId ? "💾 Сохранить промокод" : "🎟️ Создать промокод";
+ }
+}
+
+function startPromoEdit(promo) {
+ editingPromoId = promo.id;
+
+ document.getElementById("promoCode").value = promo.code;
+ document.getElementById("promoDiscount").value = promo.discount_percent;
+ document.getElementById("promoMaxUses").value = promo.max_uses ?? "";
+ document.getElementById("promoActive").checked = promo.active;
+
+ if (promo.expires_at) {
+  const date = new Date(promo.expires_at);
+  const local = new Date(date.getTime() - date.getTimezoneOffset()*60000);
+  document.getElementById("promoExpires").value = local.toISOString().slice(0,16);
+ } else {
+  document.getElementById("promoExpires").value = "";
+ }
+
+ document.getElementById("savePromoButton").textContent = "💾 Сохранить промокод";
+ document.getElementById("cancelPromoButton").classList.remove("hidden");
+ document.getElementById("promoCode").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+function cancelPromoEdit() {
+ editingPromoId = null;
+
+ document.getElementById("promoCode").value = "";
+ document.getElementById("promoDiscount").value = "";
+ document.getElementById("promoMaxUses").value = "";
+ document.getElementById("promoExpires").value = "";
+ document.getElementById("promoActive").checked = true;
+
+ document.getElementById("savePromoButton").textContent = "🎟️ Создать промокод";
+ document.getElementById("cancelPromoButton").classList.add("hidden");
+}
+
+async function togglePromo(promo) {
+ const updated = {
+  code:promo.code,
+  discount_percent:promo.discount_percent,
+  max_uses:promo.max_uses,
+  expires_at:promo.expires_at,
+  active:!promo.active
+ };
+
+ try {
+  const response = await fetch(API_URL + "/api/promocodes/" + promo.id,{
+   method:"PUT",
+   headers:authHeaders(),
+   body:JSON.stringify(updated)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Не удалось изменить промокод");
+  }
+
+  await loadPromos();
+
+ } catch(error) {
+  alert("❌ " + error.message);
+ }
+}
+
+async function deletePromo(promo) {
+ if (!confirm("Удалить промокод " + promo.code + "?")) return;
+
+ try {
+  const response = await fetch(API_URL + "/api/promocodes/" + promo.id,{
+   method:"DELETE",
+   headers:authHeaders()
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+   throw new Error(result.error || "Ошибка удаления");
+  }
+
+  await loadPromos();
+
+ } catch(error) {
+  alert("❌ " + error.message);
+ }
+}
+
+function clearSearch() {
+ document.getElementById("searchInput").value = "";
+ showProducts(currentCategory);
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>
